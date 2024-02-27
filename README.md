@@ -2,6 +2,6 @@
 
 ## Getting started
 Set-up SSH keys for authentication.
-Keep all of your project related files here. This includes the software, CAD and circuit designs.
+Keep all of your project related files here. This includes the software, CAD and circuit designs. You should organise the files your repository into folders.
 
 
