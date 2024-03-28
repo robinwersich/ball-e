@@ -1,0 +1,7 @@
+{
+  "cmake.configureSettings": {
+    "PICO_BOARD": "pico_w"
+  },
+  "cmake.sourceDirectory": "${workspaceFolder}/src",
+  "cmake.buildDirectory": "${workspaceFolder}/build"
+}
