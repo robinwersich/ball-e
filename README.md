@@ -11,16 +11,18 @@ The main concepts in the project explored are:
 
 ## Hardware List
 
-- 1 [Raspberry Pi Pico W](https://www.raspberrypi.com/products/raspberry-pi-pico/)
-- 3 [GoPiGo motors with encoders](https://gopigo.io/gopigo3-motor-replacement-kit/) (but similar motors would work, too)
-- 2 [Dual DC motor drivers](https://www.tme.eu/ee/en/details/df-dri0044/motor-control-modules/dfrobot/dri0044/)
-- 1 12V battery pack
-- 1 inertial measurement unit (specific model not yet decided)
-- parts for 3 omniwheels
-  - 3 \* 16 small rubber coated wheels similar to [these](https://www.aliexpress.com/item/2054027643.html) (+ axis)
-  - 3 \* 3 M2x8 screws + nuts
-- PCB + wires for connecting electronic components
-- metal housing (could also be 3D printed or omitted)
+- [x] 1 [Raspberry Pi Pico W](https://www.raspberrypi.com/products/raspberry-pi-pico/)
+- [x] 3 [GoPiGo motors with encoders](https://gopigo.io/gopigo3-motor-replacement-kit/) (but similar motors would work, too)
+- [ ] 2 [Dual DC motor drivers](https://www.tme.eu/ee/en/details/df-dri0044/motor-control-modules/dfrobot/dri0044/)
+- [ ] 1 12V battery pack
+- [ ] 1 inertial measurement unit (specific model not yet decided)
+- [ ] parts for 3 omniwheels
+  - [ ] 3 \* 16 small rubber coated wheels similar to [these](https://www.aliexpress.com/item/2054027643.html) (+ axis)
+  - [x] 3 \* 3 M2x8 screws + nuts
+- [ ] PCB + wires for connecting electronic components
+- [ ] 6 M2.5x25 screws (head < 2mm) + nuts for mounting the motors
+- [x] metal housing (could also be 3D printed or omitted)
+- [ ] XBox or other bluetooth controller
 
 ## 3D printed parts
 
