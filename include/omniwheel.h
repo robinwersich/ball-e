@@ -10,7 +10,8 @@
  * An omniwheel can move in any direction. It is a wheel with rollers around its circumference.
  * Thus, it has a (powered) main axis and a (non-powered) perpendicular axis of movement.
  */
-struct Omniwheel {
+class Omniwheel {
+ public:
   /**
    * Creates a new omniwheel controller.
    * @param angle The angle between the main axis of the omniwheel and what is considered forward,
@@ -28,6 +29,7 @@ struct Omniwheel {
    */
   void drive(float x, float y);
 
+ private:
   /** The conversion matrix from the global coordinate system to the wheel coordinate system */
   Matrix<float, 2, 2> transform;
   std::unique_ptr<MotorDriver> motor_driver;

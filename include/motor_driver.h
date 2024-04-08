@@ -5,7 +5,8 @@
 /**
  * Interface for motor drivers
  */
-struct MotorDriver {
+class MotorDriver {
+ public:
   virtual ~MotorDriver() = default;
 
   /**
