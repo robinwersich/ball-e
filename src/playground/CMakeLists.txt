@@ -20,6 +20,7 @@ pico_add_extra_outputs(blink)
 # --- motor test ---
 add_executable(motor_test
     motor_test.cpp
+    ../motor.cpp
 )
 
 target_include_directories(motor_test PRIVATE
