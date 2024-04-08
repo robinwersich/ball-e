@@ -1,9 +1,8 @@
-#include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/clocks.h"
 #include "hardware/pwm.h"
 
-// GP2 pin
+// GPIO pin numbers
 const uint ENA_PIN = 2;
 const uint IN1_PIN = 3;
 const uint IN2_PIN = 4;
