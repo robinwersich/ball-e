@@ -1,0 +1,16 @@
+---
+BasedOnStyle: Google
+AlignAfterOpenBracket: BlockIndent
+AlignEscapedNewlines: DontAlign
+AlignOperands: AlignAfterOperator
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+BreakArrays: false
+BreakBeforeBinaryOperators: NonAssignment
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+ColumnLimit: 100
+ContinuationIndentWidth: 2
+ConstructorInitializerIndentWidth: 2
+EmptyLineBeforeAccessModifier: Always
