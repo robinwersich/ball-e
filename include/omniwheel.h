@@ -4,7 +4,7 @@
 #include <utility>
 
 #include "matrix.h"
-#include "motor_driver/motor_driver.h"
+#include "motor_driver.h"
 
 /**
  * An omniwheel can move in any direction. It is a wheel with rollers around its circumference.
