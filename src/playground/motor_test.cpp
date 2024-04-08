@@ -1,4 +1,4 @@
-#include "motor.h"
+#include "motor_driver/l298n.h"
 
 #include "pico/stdlib.h"
 
@@ -10,8 +10,8 @@ const uint IN2_PIN = 4;
 int main() {
   stdio_init_all();
 
-  auto slice = Slice::forPin(ENA_PIN);
-  auto motor = Motor(ENA_PIN, IN1_PIN, IN2_PIN, slice);
+  auto slice = PwmSlice::forPin(ENA_PIN);
+  auto motor = MotorDriverL298N(ENA_PIN, IN1_PIN, IN2_PIN, slice);
   motor.set_duty(100);
 
   while (true) {
