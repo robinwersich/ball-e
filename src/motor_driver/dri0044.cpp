@@ -1,6 +1,7 @@
 #include "motor_driver/dri0044.h"
 
 #include <memory>
+#include <cmath>
 
 #include "hardware/pwm.h"
 #include "pico/stdlib.h"
@@ -15,22 +16,11 @@ MotorDriverDRI0044::MotorDriverDRI0044(uint pwm, uint direction, std::shared_ptr
   gpio_set_dir(pin_pwm, GPIO_OUT);
   gpio_set_dir(pin_direction, GPIO_OUT);
   gpio_set_function(pin_pwm, GPIO_FUNC_PWM);
-  set_duty_percent(0);
+  stop();
 }
 
-void MotorDriverDRI0044::set_duty_percent(uint duty) {
-  uint16_t level = pwm_slice->wrap * duty / 100;
+void MotorDriverDRI0044::drive(float speed) {
+  gpio_put(pin_direction, speed > 0);
+  uint16_t level = pwm_slice->wrap * std::abs(speed);
   pwm_set_chan_level(pwm_slice->slice_num, pwm_channel, level - 1); // -1 because count starts at 0
-}
-
-void MotorDriverDRI0044::forward() {
-  gpio_put(pin_direction, 1);
-}
-
-void MotorDriverDRI0044::backward() {
-  gpio_put(pin_direction, 0);
-}
-
-void MotorDriverDRI0044::stop() {
-  set_duty_percent(0);
 }

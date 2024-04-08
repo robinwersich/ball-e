@@ -7,10 +7,7 @@
 struct MotorDriverL298N final : MotorDriver {
   MotorDriverL298N(uint enable, uint in1, uint in2, std::shared_ptr<PwmSlice> pwm_slice);
 
-  void set_duty_percent(uint duty) override;
-  void forward() override;
-  void backward() override;
-  void stop() override;
+  void drive(float speed) override;
 
   uint pin_enable, pin_in1, pin_in2;
   std::shared_ptr<PwmSlice> pwm_slice;
