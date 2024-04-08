@@ -1,0 +1,35 @@
+#pragma once
+
+#include <memory>
+#include <utility>
+
+#include "matrix.h"
+#include "motor_driver/motor_driver.h"
+
+/**
+ * An omniwheel can move in any direction. It is a wheel with rollers around its circumference.
+ * Thus, it has a (powered) main axis and a (non-powered) perpendicular axis of movement.
+ */
+struct Omniwheel {
+  /**
+   * Creates a new omniwheel controller.
+   * @param angle The angle between the main axis of the omniwheel and what is considered forward,
+   *  in anti-clockwise degrees.
+   * @param motor_driver The motor driver for the main axis of the omniwheel.
+   * @param swap_direction Whether to swap the direction of the main axis.
+   */
+  Omniwheel(float angle, std::unique_ptr<MotorDriver> motor_driver, bool swap_direction = false);
+
+  /**
+   * Make the omniwheel drive in the direction and with the speed given by the movement vector.
+   * The length of the movement vector should be between 0 and 1.
+   * @param x The rightward component of the movement vector.
+   * @param y The forward component of the movement vector.
+   */
+  void drive(float x, float y);
+
+  /** The conversion matrix from the global coordinate system to the wheel coordinate system */
+  Matrix<float, 2, 2> transform;
+  std::unique_ptr<MotorDriver> motor_driver;
+  bool swap_direction;
+};
