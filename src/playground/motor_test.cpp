@@ -11,11 +11,10 @@ int main() {
 
   auto slice = PwmSlice::forPin(ENA_PIN);
   auto motor = MotorDriverL298N(ENA_PIN, IN1_PIN, IN2_PIN, slice);
-  motor.set_duty_percent(100);
 
   while (true) {
     sleep_ms(2000);
-    motor.forward();
+    motor.drive(100);
     sleep_ms(2000);
     motor.stop();
   }
