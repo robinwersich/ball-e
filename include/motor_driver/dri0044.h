@@ -4,15 +4,15 @@
 #include "pico/types.h"
 #include "pwm_slice.h"
 
-struct MotorDriverL298N final : MotorDriver {
-  MotorDriverL298N(uint enable, uint in1, uint in2, std::shared_ptr<PwmSlice> pwm_slice);
+struct MotorDriverDRI0044 final : MotorDriver {
+  MotorDriverDRI0044(uint pwm, uint direction, std::shared_ptr<PwmSlice> pwm_slice);
 
   void set_duty_percent(uint duty) override;
   void forward() override;
   void backward() override;
   void stop() override;
 
-  uint pin_enable, pin_in1, pin_in2;
+  uint pin_pwm, pin_direction;
   std::shared_ptr<PwmSlice> pwm_slice;
   uint pwm_channel;
 };

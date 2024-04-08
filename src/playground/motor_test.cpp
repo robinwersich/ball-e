@@ -1,5 +1,4 @@
 #include "motor_driver/l298n.h"
-
 #include "pico/stdlib.h"
 
 // GPIO pin numbers
@@ -12,7 +11,7 @@ int main() {
 
   auto slice = PwmSlice::forPin(ENA_PIN);
   auto motor = MotorDriverL298N(ENA_PIN, IN1_PIN, IN2_PIN, slice);
-  motor.set_duty(100);
+  motor.set_duty_percent(100);
 
   while (true) {
     sleep_ms(2000);
