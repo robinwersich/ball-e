@@ -20,8 +20,8 @@ pico_add_extra_outputs(blink)
 # --- motor test ---
 add_executable(motor_test
     motor_test.cpp
-    ${SRC_DIR}/motor_drivers/l298n.cpp
-    ${SRC_DIR}/pwm_slice.cpp
+    ../motor_drivers/l298n.cpp
+    ../pwm_slice.cpp
 )
 
 target_include_directories(motor_test PRIVATE
