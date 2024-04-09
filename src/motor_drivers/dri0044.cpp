@@ -1,7 +1,7 @@
 #include "motor_drivers/dri0044.h"
 
-#include <memory>
 #include <cmath>
+#include <memory>
 
 #include "hardware/pwm.h"
 #include "pico/stdlib.h"
@@ -19,8 +19,13 @@ MotorDriverDRI0044::MotorDriverDRI0044(uint pwm, uint direction, std::shared_ptr
   stop();
 }
 
-void MotorDriverDRI0044::drive(float speed) {
+MotorDriverDRI0044::MotorDriverDRI0044(uint pwm, uint direction, uint pwm_frequency)
+  : MotorDriverDRI0044(
+    pwm, direction, std::make_shared<PwmSlice>(pwm_gpio_to_slice_num(pwm), pwm_frequency)
+  ) {}
+
+void MotorDriverDRI0044::drive(float speed) const {
   gpio_put(pin_direction, speed > 0);
   uint16_t level = pwm_slice->wrap * std::abs(speed);
-  pwm_set_chan_level(pwm_slice->slice_num, pwm_channel, level - 1); // -1 because count starts at 0
+  pwm_set_chan_level(pwm_slice->slice_num, pwm_channel, level - 1);  // -1 because count starts at 0
 }

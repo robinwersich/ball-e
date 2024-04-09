@@ -27,7 +27,13 @@ class Omniwheel {
    * @param x The rightward component of the movement vector.
    * @param y The forward component of the movement vector.
    */
-  void drive(float x, float y);
+  void drive(float x, float y) const;
+
+  /**
+   * Make the omniwheel drive along the main axis.
+   * @param speed The speed at which to drive, between -1 and 1.
+   */
+  void drive(float speed) const;
 
  private:
   /** The conversion matrix from the global coordinate system to the wheel coordinate system */
