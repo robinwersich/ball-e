@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 
 #include "matrix.h"
@@ -23,8 +24,13 @@ template <typename T, unsigned Rows, unsigned Cols>
 Matrix<T, Rows, Cols> Matrix<T, Rows, Cols>::rotate(float degrees)
   requires(Rows == 2 && Cols == 2)
 {
-  double radians = degrees * M_PI / 180;
-  return {std::cos(radians), -std::sin(radians), std::sin(radians), std::cos(radians)};
+  float radians = degrees * M_PI / 180;
+  // clang-format off
+  return {{
+    std::cos(radians), -std::sin(radians),
+    std::sin(radians), std::cos(radians),
+  }};
+  // clang-format on
 }
 
 template <typename T, unsigned Rows, unsigned Cols>
