@@ -15,25 +15,23 @@ const uint PWM3 = 13;
 
 int main() {
   std::array wheels = {
-    Omniwheel(0, std::make_unique<MotorDriverDRI0044>(PWM1, DIR1, PWM_FREQUENCY)),
-    Omniwheel(120, std::make_unique<MotorDriverDRI0044>(PWM2, DIR2, PWM_FREQUENCY)),
-    Omniwheel(240, std::make_unique<MotorDriverDRI0044>(PWM3, DIR3, PWM_FREQUENCY)),
+    Omniwheel(210, std::make_unique<MotorDriverDRI0044>(PWM1, DIR1, PWM_FREQUENCY)),
+    Omniwheel(330, std::make_unique<MotorDriverDRI0044>(PWM2, DIR2, PWM_FREQUENCY)),
+    Omniwheel(90, std::make_unique<MotorDriverDRI0044>(PWM3, DIR3, PWM_FREQUENCY)),
   };
 
   Robot robot{std::move(wheels)};
   float speed = 0.5;
 
   while (true) {
-    robot.drive(speed, 0);
+    sleep_ms(500);
+    robot.drive(0, 0.5);
     sleep_ms(2000);
-    robot.drive(0, speed);
-    sleep_ms(2000);
-    robot.drive(-speed, 0);
-    sleep_ms(2000);
-    robot.drive(0, -speed);
-    sleep_ms(2000);
-    robot.rotate(1);
+    robot.stop();
+    sleep_ms(500);
+    robot.drive(0, -1.0);
     sleep_ms(1000);
+    robot.stop();
   }
 
   return 0;

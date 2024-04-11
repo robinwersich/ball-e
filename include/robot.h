@@ -20,6 +20,9 @@ class Robot {
    */
   void rotate(float speed);
 
+  /** Stops the robot. */
+  void stop();
+
  private:
   std::array<Omniwheel, 3> wheels;
 };

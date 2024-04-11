@@ -35,6 +35,9 @@ class Omniwheel {
    */
   void drive(float speed) const;
 
+  /** Stops the omniwheel. */
+  void stop() const;
+
  private:
   /** The conversion matrix from the global coordinate system to the wheel coordinate system */
   Matrix<float, 2, 2> transform;
