@@ -7,7 +7,7 @@ const uint PWM1 = 5;
 int main() {
   stdio_init_all();
 
-  auto motor = MotorDriverDRI0044(PWM1, DIR1, 1000);
+  auto motor = MotorDriverDRI0044(PWM1, DIR1, 25000);
 
   while (true) {
     sleep_ms(2000);

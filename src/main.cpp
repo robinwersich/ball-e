@@ -2,7 +2,7 @@
 #include "pico/stdlib.h"
 #include "robot.h"
 
-const uint PWM_FREQUENCY = 1000;
+const uint PWM_FREQUENCY = 25000;
 // -- motor 1 --
 const uint DIR1 = 4;
 const uint PWM1 = 5;
