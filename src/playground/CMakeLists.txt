@@ -20,7 +20,7 @@ pico_add_extra_outputs(blink)
 # --- motor test ---
 add_executable(motor_test
     motor_test.cpp
-    ../motor_drivers/l298n.cpp
+    ../motor_drivers/dri0044.cpp
     ../pwm_slice.cpp
 )
 

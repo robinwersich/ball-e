@@ -1,22 +1,25 @@
-#include "motor_drivers/l298n.h"
+#include "motor_drivers/dri0044.h"
 #include "pico/stdlib.h"
 
-// GPIO pin numbers
-const uint ENA_PIN = 2;
-const uint IN1_PIN = 3;
-const uint IN2_PIN = 4;
+const uint DIR1 = 4;
+const uint PWM1 = 5;
 
 int main() {
   stdio_init_all();
 
-  auto slice = PwmSlice::forPin(ENA_PIN);
-  auto motor = MotorDriverL298N(ENA_PIN, IN1_PIN, IN2_PIN, slice);
+  auto motor = MotorDriverDRI0044(PWM1, DIR1, 1000);
 
   while (true) {
     sleep_ms(2000);
-    motor.drive(100);
+    motor.drive(0.2);
+    sleep_ms(2000);
+    motor.drive(0.5);
+    sleep_ms(2000);
+    motor.drive(1.0);
     sleep_ms(2000);
     motor.stop();
+    sleep_ms(2000);
+    motor.drive(-0.5);
   }
 
   return 0;
