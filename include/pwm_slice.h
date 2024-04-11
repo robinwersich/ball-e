@@ -17,5 +17,5 @@ struct PwmSlice {
   void set_frequency(uint frequency);
 
   uint slice_num;
-  uint16_t wrap = 0xffff;
+  uint16_t period = 0xffff;
 };

@@ -1,5 +1,6 @@
 #include "motor_drivers/l298n.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <memory>
@@ -11,7 +12,7 @@ MotorDriverL298N::MotorDriverL298N(uint enable, uint in1, uint in2, std::shared_
   : pin_enable{enable}
   , pin_in1{in1}
   , pin_in2{in2}
-  , pwm_slice{std::make_shared<PwmSlice>(pwm_gpio_to_slice_num(pin_enable), 1000)}
+  , pwm_slice{slice}
   , pwm_channel{pwm_gpio_to_channel(pin_enable)} {
   gpio_init(pin_enable);
   gpio_init(pin_in1);
@@ -29,8 +30,10 @@ MotorDriverL298N::MotorDriverL298N(uint enable, uint in1, uint in2, uint pwm_fre
   ) {}
 
 void MotorDriverL298N::drive(float speed) const {
+  speed = std::clamp(speed, -1.0f, 1.0f);
+
   gpio_put(pin_in1, speed > 0);
   gpio_put(pin_in2, speed < 0);
-  uint16_t level = pwm_slice->wrap * std::abs(speed);
-  pwm_set_chan_level(pwm_slice->slice_num, pwm_channel, level - 1);  // -1 because count starts at 0
+  uint16_t level = pwm_slice->period * std::abs(speed);
+  pwm_set_chan_level(pwm_slice->slice_num, pwm_channel, level);
 }

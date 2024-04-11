@@ -20,6 +20,6 @@ void PwmSlice::set_frequency(uint frequency) {
   uint32_t f_clock = 1000000UL;
   float divider = (float)f_sys / f_clock;
   pwm_set_clkdiv(slice_num, divider);
-  wrap = f_clock / frequency;
-  pwm_set_wrap(slice_num, wrap - 1);  // -1 because counter starts at 0
+  period = f_clock / frequency;
+  pwm_set_wrap(slice_num, period - 1);  // -1 because counter starts at 0
 }
