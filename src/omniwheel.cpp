@@ -10,7 +10,7 @@ Omniwheel::Omniwheel(float angle, std::unique_ptr<MotorDriver> motor_driver, boo
   , swap_direction{swap_direction} {}
 
 void Omniwheel::drive(float x, float y) const {
-  auto [primary_speed, secondary_speed] = (transform * Matrix<float, 2, 1>{{x, y}}).data;
+  auto [secondary_speed, primary_speed] = (transform * Matrix<float, 2, 1>{{x, y}}).data;
   drive(primary_speed);
 }
 
