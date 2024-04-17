@@ -9,12 +9,12 @@
 class MotorDriverL298N final : public MotorDriver {
  public:
   MotorDriverL298N(uint enable, uint in1, uint in2, std::shared_ptr<PwmSlice> pwm_slice);
-  MotorDriverL298N(uint enable, uint in1, uint in2, uint pwm_frequency = 1000);
+  MotorDriverL298N(uint enable, uint in1, uint in2, uint pwm_frequency);
 
   void drive(float speed) const override;
 
  private:
-  uint pin_enable, pin_in1, pin_in2;
-  std::shared_ptr<PwmSlice> pwm_slice;
-  uint pwm_channel;
+  uint _pin_enable, _pin_in1, _pin_in2;
+  std::shared_ptr<PwmSlice> _pwm_slice;
+  uint _pwm_channel;
 };

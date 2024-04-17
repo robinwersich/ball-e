@@ -40,7 +40,7 @@ class Omniwheel {
 
  private:
   /** The conversion matrix from the global coordinate system to the wheel coordinate system */
-  Matrix<float, 2, 2> transform;
-  std::unique_ptr<MotorDriver> motor_driver;
-  bool swap_direction;
+  Matrix<float, 2, 2> _transform;
+  std::unique_ptr<MotorDriver> _motor_driver;
+  bool _swap_direction;
 };

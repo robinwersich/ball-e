@@ -24,5 +24,5 @@ class Robot {
   void stop();
 
  private:
-  std::array<Omniwheel, 3> wheels;
+  std::array<Omniwheel, 3> _wheels;
 };
