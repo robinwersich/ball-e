@@ -21,9 +21,7 @@ MotorDriverDRI0044::MotorDriverDRI0044(uint pwm, uint direction, std::shared_ptr
 }
 
 MotorDriverDRI0044::MotorDriverDRI0044(uint pwm, uint direction, uint pwm_frequency)
-  : MotorDriverDRI0044(
-    pwm, direction, std::make_shared<PwmSlice>(pwm_gpio_to_slice_num(pwm), pwm_frequency)
-  ) {}
+  : MotorDriverDRI0044(pwm, direction, PwmSlice::for_pin(pwm, pwm_frequency)) {}
 
 void MotorDriverDRI0044::drive(float speed) const {
   speed = std::clamp(speed, -1.0f, 1.0f);

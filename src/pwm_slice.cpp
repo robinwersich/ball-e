@@ -13,7 +13,11 @@ PwmSlice::PwmSlice(uint slice_num, uint frequency) : slice_num{slice_num} {
 
 PwmSlice::~PwmSlice() { pwm_set_enabled(slice_num, false); }
 
-std::shared_ptr<PwmSlice> PwmSlice::forPin(uint pin, uint frequency) {
+std::shared_ptr<PwmSlice> PwmSlice::for_slice(uint slice_num, uint frequency) {
+  return std::make_shared<PwmSlice>(slice_num, frequency);
+}
+
+std::shared_ptr<PwmSlice> PwmSlice::for_pin(uint pin, uint frequency) {
   return std::make_shared<PwmSlice>(pwm_gpio_to_slice_num(pin), frequency);
 }
 
