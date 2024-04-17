@@ -6,6 +6,8 @@ add_executable(robot_firmware
     omniwheel.cpp
     pwm_slice.cpp
     motor_drivers/dri0044.cpp
+    motor_decoder.cpp
+    interrupt_handler.cpp
 )
 
 target_include_directories(robot_firmware PRIVATE
