@@ -17,4 +17,4 @@ void register_callback(uint gpio, uint32_t event_mask, const std::function<void(
 void register_callback(uint gpio, uint32_t event_mask, const std::function<void()>&);
 void unregister_callback(uint gpio, uint32_t event_mask);
 
-}  // namespace interrupts
+}

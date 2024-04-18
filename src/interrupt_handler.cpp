@@ -20,7 +20,7 @@ void handle_interrupt(uint gpio, uint32_t event_mask) {
   }
 }
 
-}  // namespace
+}
 
 namespace interrupts {
 
@@ -56,4 +56,4 @@ void unregister_callback(uint gpio, uint32_t event_mask) {
   );
 }
 
-}  // namespace interrupts
+}

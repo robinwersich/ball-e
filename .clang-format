@@ -6,6 +6,7 @@ AlignOperands: AlignAfterOperator
 AllowShortBlocksOnASingleLine: Always
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AlwaysBreakTemplateDeclarations: MultiLine
 BreakArrays: false
 BreakBeforeBinaryOperators: NonAssignment
 BreakConstructorInitializers: BeforeComma
@@ -14,3 +15,4 @@ ColumnLimit: 100
 ContinuationIndentWidth: 2
 ConstructorInitializerIndentWidth: 2
 EmptyLineBeforeAccessModifier: Always
+FixNamespaceComments: false
