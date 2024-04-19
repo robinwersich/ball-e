@@ -21,6 +21,7 @@ class MotorDecoder {
   ~MotorDecoder();
 
   inline int64_t count() const { return _count; }
+  inline uint64_t last_count_micros() const { return _last_count_micros; }
 
  private:
   const uint _pin_a, _pin_b;

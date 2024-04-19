@@ -8,6 +8,7 @@ add_executable(robot_firmware
     motor_drivers/dri0044.cpp
     motor_decoder.cpp
     interrupt_handler.cpp
+    velocity_measurement.cpp
 )
 
 target_include_directories(robot_firmware PRIVATE
