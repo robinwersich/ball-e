@@ -25,7 +25,7 @@ class MotorDecoder {
  private:
   const uint _pin_a, _pin_b;
   int64_t _count = 0;
+  uint64_t _last_count_micros = 0;
 
   void on_a_change();
-  void on_b_change();
 };
