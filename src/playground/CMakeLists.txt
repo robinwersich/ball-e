@@ -55,3 +55,26 @@ pico_enable_stdio_usb(decoder_test 1)
 pico_enable_stdio_uart(decoder_test 0)
 
 pico_add_extra_outputs(decoder_test)
+
+# --- pid driver test ---
+add_executable(pid_driver_test
+    pid_driver_test.cpp
+    ../motor_driver_pid.cpp
+    ../motor_decoder.cpp
+    ../velocity_measurement.cpp
+    ../pid.cpp
+    ../pwm_slice.cpp
+    ../interrupt_handler.cpp
+    ../motor_drivers/dri0044.cpp
+)
+
+target_include_directories(pid_driver_test PRIVATE
+    ${INCLUDE_DIR}
+)
+
+target_link_libraries(pid_driver_test
+    pico_stdlib
+    hardware_pwm
+)
+
+pico_add_extra_outputs(pid_driver_test)

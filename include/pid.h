@@ -2,6 +2,8 @@
 
 #include <optional>
 
+#include "pico/types.h"
+
 struct PidGains {
   float kp = 1.0, ki = 0.0, kd = 0.0;
 };

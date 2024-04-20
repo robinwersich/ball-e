@@ -17,11 +17,11 @@ class VelocityMeter {
     std::shared_ptr<MotorDecoder> decoder, float ticks_per_revolution, float gear_ratio
   );
 
-  /** Returns the current speed in ticks per second. */
+  /** Computes the average speed since the last measurement in ticks per second. */
   float compute_speed_tps();
-  /** Returns the current speed in revolutions per second. */
+  /** Computes the average speed since the last measurement in revolutions per second. */
   float compute_speed_rps();
-  /** Returns the current speed in revolutions per minute. */
+  /** Computes the average speed since the last measurement in revolutions per minute. */
   float compute_speed_rpm();
 
  private:
