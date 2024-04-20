@@ -9,6 +9,7 @@ add_executable(robot_firmware
     motor_decoder.cpp
     interrupt_handler.cpp
     velocity_measurement.cpp
+    pid.cpp
 )
 
 target_include_directories(robot_firmware PRIVATE
