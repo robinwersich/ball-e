@@ -5,20 +5,20 @@
 #include "pico/stdlib.h"
 
 PidController::PidController(
-  float out_min, float out_max, uint32_t sample_time_millis, float kp, float ki, float kd
+  float out_min, float out_max, uint32_t sample_time_millis, PidGains gains
 )
   : _out_min{out_min}
   , _out_max{out_max}
   , _sample_time_millis{sample_time_millis}
-  , _kp{kp}  // Multiplying ki by sample time allows omitting it in the compute function
-  , _ki{ki * sample_time_millis}
+  , _kp{gains.kp}  // Multiplying ki by sample time allows omitting it in the compute function
+  , _ki{gains.ki * sample_time_millis}
   // Dividing kd by sample time allows omitting it in the compute function
-  , _kd{kd / sample_time_millis} {}
+  , _kd{gains.kd / sample_time_millis} {}
 
-void PidController::set_gains(float kp, float ki, float kd) {
-  set_proportional_gain(kp);
-  set_integral_gain(ki);
-  set_derivative_gain(kd);
+void PidController::set_gains(PidGains gains) {
+  set_proportional_gain(gains.kp);
+  set_integral_gain(gains.ki);
+  set_derivative_gain(gains.kd);
 }
 
 void PidController::set_proportional_gain(float kp) { _kp = kp; }

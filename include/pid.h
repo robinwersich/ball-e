@@ -2,6 +2,10 @@
 
 #include <optional>
 
+struct PidGains {
+  float kp = 1.0, ki = 0.0, kd = 0.0;
+};
+
 /**
  * A feedback controller that adjusts a control signal based on the error between a target and
  * a measurement. The control signal is the sum of the proportional (present), integral (past),
@@ -11,11 +15,10 @@ class PidController {
  public:
   /** Creates a new PID controller with the given gains. */
   PidController(
-    float out_min, float out_max, uint32_t sample_time_millis = 10, float kp = 1.0,
-    float ki = 0.0, float kd = 0.0
+    float out_min, float out_max, uint32_t sample_time_millis = 10, PidGains gains = {}
   );
 
-  void set_gains(float kp, float ki, float kd);
+  void set_gains(PidGains gains);
   void set_proportional_gain(float kp);
   void set_integral_gain(float ki);
   void set_derivative_gain(float kd);
