@@ -11,7 +11,7 @@ class PidController {
  public:
   /** Creates a new PID controller with the given gains. */
   PidController(
-    float out_min, float out_max, uint64_t sample_time_micros = 10000, float kp = 1.0,
+    float out_min, float out_max, uint32_t sample_time_millis = 10, float kp = 1.0,
     float ki = 0.0, float kd = 0.0
   );
 
@@ -46,12 +46,12 @@ class PidController {
   std::optional<float> compute_if_sample_time(float measurement);
 
  private:
-  uint64_t _sample_time;
+  uint32_t _sample_time_millis;
   float _kp, _ki, _kd;
   float _out_min, _out_max;
   float _scaled_error_sum = 0.0;  // already multiplied by ki
   float _previous_error = 0.0;
   float _last_target = 0.0;
   float _last_measurement = 0.0;
-  uint64_t _last_time = 0;
+  uint32_t _last_time_millis = 0;
 };

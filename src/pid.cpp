@@ -1,17 +1,19 @@
 #include "pid.h"
 
+#include <algorithm>
+
 #include "pico/stdlib.h"
 
 PidController::PidController(
-  float out_min, float out_max, uint64_t sample_time_micros, float kp, float ki, float kd
+  float out_min, float out_max, uint32_t sample_time_millis, float kp, float ki, float kd
 )
   : _out_min{out_min}
   , _out_max{out_max}
-  , _sample_time{sample_time_micros}
+  , _sample_time_millis{sample_time_millis}
   , _kp{kp}  // Multiplying ki by sample time allows omitting it in the compute function
-  , _ki{ki * sample_time_micros}
+  , _ki{ki * sample_time_millis}
   // Dividing kd by sample time allows omitting it in the compute function
-  , _kd{kd / sample_time_micros} {}
+  , _kd{kd / sample_time_millis} {}
 
 void PidController::set_gains(float kp, float ki, float kd) {
   set_proportional_gain(kp);
@@ -20,8 +22,8 @@ void PidController::set_gains(float kp, float ki, float kd) {
 }
 
 void PidController::set_proportional_gain(float kp) { _kp = kp; }
-void PidController::set_integral_gain(float ki) { _ki = ki * _sample_time; }
-void PidController::set_derivative_gain(float kd) { _kd = kd / _sample_time; }
+void PidController::set_integral_gain(float ki) { _ki = ki * _sample_time_millis; }
+void PidController::set_derivative_gain(float kd) { _kd = kd / _sample_time_millis; }
 
 void PidController::set_target(float target) { _last_target = target; }
 
@@ -30,18 +32,16 @@ float PidController::compute_at_sample_time(float measurement, float target) {
 
   // multiplication by (constant) dt is part of ki
   _scaled_error_sum += error * _ki;
-
   // prevent integral windup
-  if (_scaled_error_sum > _out_max) _scaled_error_sum = _out_max;
-  else if (_scaled_error_sum < _out_min) _scaled_error_sum = _out_min;
-
+  _scaled_error_sum = std::clamp(_scaled_error_sum, _out_min, _out_max);
   // derivative on measurement (not error) to prevent derivative kick
   // multiplication by (constant) dt is part of kd
   const auto measurement_change = measurement - _last_measurement;
 
   _previous_error = error;
 
-  return _kp * error + _ki * _scaled_error_sum - _kd * measurement_change;
+  const auto output = _kp * error + _scaled_error_sum - _kd * measurement_change;
+  return std::clamp(output, _out_min, _out_max);
 }
 
 float PidController::compute_at_sample_time(float measurement) {
@@ -49,12 +49,12 @@ float PidController::compute_at_sample_time(float measurement) {
 }
 
 std::optional<float> PidController::compute_if_sample_time(float measurement, float target) {
-  const auto now = time_us_64();
-  const auto dt = now - _last_time;
+  const auto now = us_to_ms(time_us_64());
+  const auto dt = now - _last_time_millis;
 
-  if (dt < _sample_time) return {};
+  if (dt < _sample_time_millis) return {};
 
-  _last_time = now;
+  _last_time_millis = now;
   return compute_at_sample_time(measurement, target);
 }
 
