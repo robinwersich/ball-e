@@ -53,8 +53,8 @@ class PidController {
   float _kp, _ki, _kd;
   float _out_min, _out_max;
   float _scaled_error_sum = 0.0;  // already multiplied by ki
-  float _previous_error = 0.0;
-  float _last_target = 0.0;
+  float _last_error = 0.0;
+  float _target = 0.0;
   float _last_measurement = 0.0;
   uint32_t _last_time_millis = 0;
 };

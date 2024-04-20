@@ -25,27 +25,29 @@ void PidController::set_proportional_gain(float kp) { _kp = kp; }
 void PidController::set_integral_gain(float ki) { _ki = ki * _sample_time_millis; }
 void PidController::set_derivative_gain(float kd) { _kd = kd / _sample_time_millis; }
 
-void PidController::set_target(float target) { _last_target = target; }
+void PidController::set_target(float target) { _target = target; }
 
 float PidController::compute_at_sample_time(float measurement, float target) {
-  const auto error = target - measurement;
+  _target = target;
+  return compute_at_sample_time(measurement);
+}
+
+float PidController::compute_at_sample_time(float measurement) {
+  const auto error = _target - measurement;
 
   // multiplication by (constant) dt is part of ki
-  _scaled_error_sum += error * _ki;
+  _scaled_error_sum += (error + _last_error) / 2 * _ki;
   // prevent integral windup
   _scaled_error_sum = std::clamp(_scaled_error_sum, _out_min, _out_max);
   // derivative on measurement (not error) to prevent derivative kick
   // multiplication by (constant) dt is part of kd
   const auto measurement_change = measurement - _last_measurement;
 
-  _previous_error = error;
+  _last_error = error;
+  _last_measurement = measurement;
 
   const auto output = _kp * error + _scaled_error_sum - _kd * measurement_change;
   return std::clamp(output, _out_min, _out_max);
-}
-
-float PidController::compute_at_sample_time(float measurement) {
-  return compute_at_sample_time(measurement, _last_target);
 }
 
 std::optional<float> PidController::compute_if_sample_time(float measurement, float target) {
@@ -59,5 +61,5 @@ std::optional<float> PidController::compute_if_sample_time(float measurement, fl
 }
 
 std::optional<float> PidController::compute_if_sample_time(float measurement) {
-  return compute_if_sample_time(measurement, _last_target);
+  return compute_if_sample_time(measurement, _target);
 }
