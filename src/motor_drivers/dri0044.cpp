@@ -23,7 +23,7 @@ MotorDriverDRI0044::MotorDriverDRI0044(uint pwm, uint direction, std::shared_ptr
 MotorDriverDRI0044::MotorDriverDRI0044(uint pwm, uint direction, uint pwm_frequency)
   : MotorDriverDRI0044(pwm, direction, PwmSlice::for_pin(pwm, pwm_frequency)) {}
 
-void MotorDriverDRI0044::drive(float speed) const {
+void MotorDriverDRI0044::drive(float speed) {
   speed = std::clamp(speed, -1.0f, 1.0f);
 
   gpio_put(_pin_direction, speed > 0);

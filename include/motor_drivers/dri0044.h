@@ -11,7 +11,7 @@ class MotorDriverDRI0044 final : public MotorDriver {
   MotorDriverDRI0044(uint pwm, uint direction, std::shared_ptr<PwmSlice> pwm_slice);
   MotorDriverDRI0044(uint pwm, uint direction, uint pwm_frequency);
 
-  void drive(float speed) const override;
+  void drive(float speed) override;
 
  private:
   uint _pin_pwm, _pin_direction;
