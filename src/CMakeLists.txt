@@ -4,21 +4,13 @@ add_executable(robot_firmware
     main.cpp
     robot.cpp
     omniwheel.cpp
-    pwm_slice.cpp
-    motor_drivers/dri0044.cpp
-    motor_decoder.cpp
-    interrupt_handler.cpp
-    velocity_measurement.cpp
-    pid.cpp
-)
-
-target_include_directories(robot_firmware PRIVATE
-    ${INCLUDE_DIR}
 )
 
 target_link_libraries(robot_firmware
     pico_stdlib
     hardware_pwm
+    motor_hardware
+    pid
 )
 
 pico_add_extra_outputs(robot_firmware)

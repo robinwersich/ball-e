@@ -8,7 +8,5 @@ set(CMAKE_CXX_STANDARD 23)
 
 pico_sdk_init()
 
-set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-
+add_subdirectory(lib)
 add_subdirectory(src)
