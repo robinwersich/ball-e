@@ -20,6 +20,9 @@ class MotorDecoder {
   /** Unregisters the interrupt handlers. */
   ~MotorDecoder();
 
+  MotorDecoder(const MotorDecoder&) = delete;
+  MotorDecoder& operator=(const MotorDecoder&) = delete;
+
   inline int64_t count() const { return _count; }
   inline uint64_t last_count_micros() const { return _last_count_micros; }
 

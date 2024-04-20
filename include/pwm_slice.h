@@ -23,6 +23,9 @@ class PwmSlice {
   /** Disables the PWM slice. */
   ~PwmSlice();
 
+  PwmSlice(const PwmSlice&) = delete;
+  PwmSlice& operator=(const PwmSlice&) = delete;
+
   void set_frequency(uint frequency);
 
   const uint slice_num;
