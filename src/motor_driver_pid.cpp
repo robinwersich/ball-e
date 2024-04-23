@@ -7,7 +7,7 @@ MotorDriverPid::MotorDriverPid(
   : _driver{std::move(driver)}
   , _max_speed{motor_spec.max_rpm}
   , _controller{-1.0, 1.0, MotorDriverPid::sample_time_millis, pid_gains}
-  , _velocity_meter{std::move(decoder), motor_spec.ticks_per_revolution, motor_spec.gear_ratio} {
+  , _motor_state{std::move(decoder), motor_spec.ticks_per_revolution, motor_spec.gear_ratio} {
   add_repeating_timer_ms(
     MotorDriverPid::sample_time_millis,
     [](repeating_timer_t* timer) {
@@ -27,7 +27,7 @@ void MotorDriverPid::drive(float speed) { drive_rpm(speed * _max_speed); }
 PidController& MotorDriverPid::controller() { return _controller; }
 
 void MotorDriverPid::update_controllers() {
-  const auto rpm = _velocity_meter.compute_speed_rpm();
+  const auto rpm = _motor_state.compute_speed_rpm();
   const auto output = _controller.compute_at_sample_time(rpm);
   _driver->drive(output);
 }

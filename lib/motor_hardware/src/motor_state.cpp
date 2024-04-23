@@ -1,14 +1,20 @@
-#include "velocity_measurement.h"
+#include "motor_state.h"
 
 static const uint64_t max_measurement_interval = 1000000;
 static const uint64_t micros_per_second = 1000000;
 
-VelocityMeter::VelocityMeter(
+MotorState::MotorState(
   std::shared_ptr<MotorDecoder> decoder, float ticks_per_revolution, float gear_ratio
 )
-  : _decoder{std::move(decoder)}, _speed_factor{1 / (ticks_per_revolution * gear_ratio)} {}
+  : _decoder{std::move(decoder)}, _revolutions_per_tick{1 / (ticks_per_revolution * gear_ratio)} {}
 
-float VelocityMeter::compute_speed_tps() {
+double MotorState::current_position_revs() {
+  return _decoder->count() * static_cast<double>(_revolutions_per_tick);
+}
+
+double MotorState::current_position_deg() { return current_position_revs() * 360; }
+
+float MotorState::compute_speed_tps() {
   const auto new_count = _decoder->count();
   const auto new_count_micros = _decoder->last_count_micros();
   const auto delta_count = new_count - _last_count;
@@ -21,5 +27,5 @@ float VelocityMeter::compute_speed_tps() {
   return delta_count / static_cast<float>(delta_time / micros_per_second);
 }
 
-float VelocityMeter::compute_speed_rps() { return compute_speed_tps() * _speed_factor; }
-float VelocityMeter::compute_speed_rpm() { return compute_speed_rps() * 60; }
+float MotorState::compute_speed_rps() { return compute_speed_tps() * _revolutions_per_tick; }
+float MotorState::compute_speed_rpm() { return compute_speed_rps() * 60; }

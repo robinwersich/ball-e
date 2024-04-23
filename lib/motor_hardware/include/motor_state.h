@@ -4,8 +4,8 @@
 
 #include "motor_decoder.h"
 
-/** Measures motor velocity based on decoder readings. */
-class VelocityMeter {
+/** Measures motor position and velocity based on decoder readings. */
+class MotorState {
  public:
   /**
    * Creates a new velocity meter.
@@ -13,9 +13,12 @@ class VelocityMeter {
    * @param ticks_per_revolution The number of ticks the encoder produces per motor revolution.
    * @param gear_ratio How many rotations of the motor are required for one shaft rotation.
    */
-  VelocityMeter(
-    std::shared_ptr<MotorDecoder> decoder, float ticks_per_revolution, float gear_ratio
-  );
+  MotorState(std::shared_ptr<MotorDecoder> decoder, float ticks_per_revolution, float gear_ratio);
+
+  /** Returns the current position in terms of revolutions since start of measurement. */
+  double current_position_revs();
+  /** Returns the current position in terms of degrees since start of movement. */
+  double current_position_deg();
 
   /** Computes the average speed since the last measurement in ticks per second. */
   float compute_speed_tps();
@@ -28,5 +31,5 @@ class VelocityMeter {
   std::shared_ptr<MotorDecoder> _decoder;
   uint64_t _last_count_micros = 0;
   int64_t _last_count = 0;
-  float _speed_factor;
+  float _revolutions_per_tick;  // shaft revolutions
 };

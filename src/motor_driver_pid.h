@@ -6,9 +6,9 @@
 
 #include "motor_decoder.h"
 #include "motor_driver.h"
+#include "motor_state.h"
 #include "pico/time.h"
 #include "pid.h"
-#include "velocity_measurement.h"
 
 struct MotorSpec {
   // The number of encoder ticks per revolution of the motor.
@@ -57,7 +57,7 @@ class MotorDriverPid : public MotorDriver {
  private:
   std::shared_ptr<MotorDriver> _driver;
   PidController _controller;
-  VelocityMeter _velocity_meter;
+  MotorState _motor_state;
   float _max_speed;
 
   repeating_timer_t _update_timer;
