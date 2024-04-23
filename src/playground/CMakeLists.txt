@@ -70,6 +70,9 @@ target_link_libraries(pid_driver_test
     debugging
 )
 
+pico_enable_stdio_usb(pid_driver_test 1)
+pico_enable_stdio_uart(pid_driver_test 0)
+
 pico_add_extra_outputs(pid_driver_test)
 
 # --- debugging test ---

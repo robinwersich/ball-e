@@ -1,7 +1,6 @@
 #include "parameters.h"
 
 #include <iostream>
-#include <string>
 #include <map>
 
 #include "pico/stdlib.h"
@@ -36,11 +35,11 @@ void update_parameters() {
 
 namespace parameters {
 
-void register_parameter(const char* name, const std::function<void(float)>& setter) {
+void register_parameter(const std::string& name, const std::function<void(float)>& setter) {
   parameter_setters.emplace(name, setter);
 }
 
-void unregister_parameter(const char* name) { parameter_setters.erase(name); }
+void unregister_parameter(const std::string& name) { parameter_setters.erase(name); }
 
 void start_updating() {
   multicore_launch_core1(update_parameters);

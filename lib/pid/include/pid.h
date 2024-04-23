@@ -1,11 +1,15 @@
 #pragma once
 
 #include <optional>
+#ifdef DEBUG
+#include <map>
+#include <string>
+#endif
 
 #include "pico/types.h"
 
 struct PidGains {
-  float kp = 1.0, ki = 0.0, kd = 0.0;
+  float kp = 0.0, ki = 0.0, kd = 0.0;
 };
 
 /**
@@ -15,10 +19,25 @@ struct PidGains {
  */
 class PidController {
  public:
-  /** Creates a new PID controller with the given gains. */
+  /**
+   * Creates a new PID controller.
+   * @param out_min The minimum value the controlled plant can accept.
+   * @param out_max The maximum value the controlled plant can accept.
+   * @param sample_time_millis The time between each control signal computation in milliseconds.
+   * @param gains The proportional, integral, and derivative gain for the controller.
+   * @param category The category of this controller.
+   *   In debug mode, tuning parameters will be registered for each category:
+   *   kp_<category>, ki_<category>, kd_<category>
+   */
   PidController(
-    float out_min, float out_max, uint32_t sample_time_millis = 10, PidGains gains = {}
+    float out_min, float out_max, uint32_t sample_time_millis = 10, PidGains gains = {},
+    const char* category = ""
   );
+
+  ~PidController();
+
+  PidController(const PidController&) = delete;
+  PidController& operator=(const PidController&) = delete;
 
   void set_gains(PidGains gains);
   void set_proportional_gain(float kp);
@@ -59,4 +78,10 @@ class PidController {
   float _target = 0.0;
   float _last_measurement = 0.0;
   uint32_t _last_time_millis = 0;
+
+#ifdef DEBUG
+  static std::multimap<std::string, PidController*> _controllers_by_category;
+  static void register_controller(const std::string& category, PidController* controller);
+  static void unregister_controller(PidController* controller);
+#endif
 };
