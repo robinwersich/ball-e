@@ -67,6 +67,26 @@ target_link_libraries(pid_driver_test
     pico_stdlib
     motor_hardware
     pid
+    debugging
 )
 
 pico_add_extra_outputs(pid_driver_test)
+
+# --- debugging test ---
+add_executable(debugging_test
+    debugging_test.cpp
+)
+
+target_include_directories(debugging_test PRIVATE
+    ..
+)
+
+target_link_libraries(debugging_test
+    pico_stdlib
+    debugging
+)
+
+pico_enable_stdio_usb(debugging_test 1)
+pico_enable_stdio_uart(debugging_test 0)
+
+pico_add_extra_outputs(debugging_test)
