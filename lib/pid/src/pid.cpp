@@ -4,6 +4,7 @@
 
 #ifndef NDEBUG
 #include "parameters.h"
+#include "plot.h"
 #endif
 #include "pico/stdlib.h"
 
@@ -59,12 +60,24 @@ float PidController::compute_at_sample_time(float measurement) {
   // derivative on measurement (not error) to prevent derivative kick
   // multiplication by (constant) dt is part of kd
   const auto measurement_change = measurement - _last_measurement;
+  const auto p_term = error * _kp;
+  const auto i_term = _scaled_error_sum;
+  const auto d_term = -measurement_change * _kd;
 
   _last_error = error;
   _last_measurement = measurement;
 
-  const auto output = _kp * error + _scaled_error_sum - _kd * measurement_change;
-  return std::clamp(output, _out_min, _out_max);
+  const auto output = std::clamp(p_term + i_term + d_term, _out_min, _out_max);
+#ifndef NDEBUG
+  plot("p", p_term);
+  plot("i", i_term);
+  plot("d", d_term);
+  plot("target", _target);
+  plot("measurement", measurement);
+  plot("output", output);
+#endif
+
+  return output;
 }
 
 std::optional<float> PidController::compute_if_sample_time(float measurement, float target) {

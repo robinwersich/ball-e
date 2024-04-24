@@ -1,6 +1,7 @@
 #include "motor_driver_pid.h"
 #include "motor_drivers/dri0044.h"
 #include "pico/stdlib.h"
+#include "parameters.h"
 
 const uint PWM_FREQUENCY = 25000;
 // -- motor 1 --
@@ -18,17 +19,13 @@ int main() {
   const PidGains pid_gains{.kp = 0.0, .ki = 0.0, .kd = 0.0};
   auto pid_driver = MotorDriverPid(raw_driver, decoder, motor_spec, pid_gains, "motor");
 
+  parameters::register_parameter("speed", [&](float speed) {
+    pid_driver.drive(speed);
+  });
+  parameters::start_updating();
+
   while (true) {
-    sleep_ms(2000);
-    pid_driver.drive(0.2);
-    sleep_ms(2000);
-    pid_driver.drive(0.5);
-    sleep_ms(2000);
-    pid_driver.drive(1.0);
-    sleep_ms(2000);
-    pid_driver.stop();
-    sleep_ms(2000);
-    pid_driver.drive(-0.5);
+    sleep_ms(1000);
   }
 
   return 0;
