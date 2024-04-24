@@ -34,4 +34,10 @@ void MotorDriverL298N::drive(float speed) {
   gpio_put(_pin_in2, speed < 0);
   uint16_t level = _pwm_slice->period * std::abs(speed);
   pwm_set_chan_level(_pwm_slice->slice_num, _pwm_channel, level);
+  _speed = speed;
+}
+
+void MotorDriverL298N::set_pwm_frequency(uint frequency) {
+  _pwm_slice->set_frequency(frequency);
+  drive(_speed);
 }

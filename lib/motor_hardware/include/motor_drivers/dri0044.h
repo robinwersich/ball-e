@@ -13,8 +13,11 @@ class MotorDriverDRI0044 final : public MotorDriver {
 
   void drive(float speed) override;
 
+  void set_pwm_frequency(uint frequency);
+
  private:
   uint _pin_pwm, _pin_direction;
   std::shared_ptr<PwmSlice> _pwm_slice;
   uint _pwm_channel;
+  float _speed = 0.0;
 };

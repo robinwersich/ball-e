@@ -13,8 +13,11 @@ class MotorDriverL298N final : public MotorDriver {
 
   void drive(float speed) override;
 
+  void set_pwm_frequency(uint frequency);
+
  private:
   uint _pin_enable, _pin_in1, _pin_in2;
   std::shared_ptr<PwmSlice> _pwm_slice;
   uint _pwm_channel;
+  float _speed = 0.0;
 };
