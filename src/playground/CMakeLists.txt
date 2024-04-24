@@ -44,14 +44,34 @@ target_include_directories(decoder_test PRIVATE
 
 target_link_libraries(decoder_test
     pico_stdlib
-    pico_cyw43_arch_none
     motor_hardware
+    debugging
 )
 
 pico_enable_stdio_usb(decoder_test 1)
 pico_enable_stdio_uart(decoder_test 0)
 
 pico_add_extra_outputs(decoder_test)
+
+# --- velocity test ---
+add_executable(velocity_test
+    velocity_test.cpp
+)
+
+target_include_directories(velocity_test PRIVATE
+    ..
+)
+
+target_link_libraries(velocity_test
+    pico_stdlib
+    motor_hardware
+    debugging
+)
+
+pico_enable_stdio_usb(velocity_test 1)
+pico_enable_stdio_uart(velocity_test 0)
+
+pico_add_extra_outputs(velocity_test)
 
 # --- pid driver test ---
 add_executable(pid_driver_test
