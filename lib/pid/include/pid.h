@@ -1,7 +1,7 @@
 #pragma once
 
 #include <optional>
-#ifdef DEBUG
+#ifndef NDEBUG
 #include <map>
 #include <string>
 #endif
@@ -79,7 +79,7 @@ class PidController {
   float _last_measurement = 0.0;
   uint32_t _last_time_millis = 0;
 
-#ifdef DEBUG
+#ifndef NDEBUG
   static std::multimap<std::string, PidController*> _controllers_by_category;
   static void register_controller(const std::string& category, PidController* controller);
   static void unregister_controller(PidController* controller);

@@ -1,5 +1,5 @@
 #include "motor_driver_pid.h"
-#ifdef DEBUG
+#ifndef NDEBUG
 #include "plot.h"
 #endif
 
@@ -33,7 +33,7 @@ void MotorDriverPid::update_controllers() {
   const auto rpm = _motor_state.compute_speed_rpm();
   const auto output = _controller.compute_at_sample_time(rpm);
   _driver->drive(output);
-#ifdef DEBUG
+#ifndef NDEBUG
   plot("rpm", rpm);
   plot("output", output);
 #endif

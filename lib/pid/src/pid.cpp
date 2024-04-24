@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#ifdef DEBUG
+#ifndef NDEBUG
 #include "parameters.h"
 #endif
 #include "pico/stdlib.h"
@@ -17,13 +17,13 @@ PidController::PidController(
   , _ki{gains.ki * sample_time_millis}
   // Dividing kd by sample time allows omitting it in the compute function
   , _kd{gains.kd / sample_time_millis} {
-#ifdef DEBUG
+#ifndef NDEBUG
   PidController::register_controller(category, this);
 #endif
 }
 
 PidController::~PidController() {
-#ifdef DEBUG
+#ifndef NDEBUG
   PidController::unregister_controller(this);
 #endif
 }
@@ -77,7 +77,7 @@ std::optional<float> PidController::compute_if_sample_time(float measurement) {
   return compute_if_sample_time(measurement, _target);
 }
 
-#ifdef DEBUG
+#ifndef NDEBUG
 std::multimap<std::string, PidController*> PidController::_controllers_by_category;
 
 void PidController::register_controller(const std::string& category, PidController* controller) {
