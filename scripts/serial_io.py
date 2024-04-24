@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import threading
-from collections import defaultdict
+import sys
+from collections import defaultdict, deque
 from serial import Serial, SerialException
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -24,9 +25,9 @@ def read_user_input():
 # Start separate thread for user input so it doesn't block the drawing
 threading.Thread(target=read_user_input, daemon=True).start()
 
-
-timestamps = defaultdict(list)
-values = defaultdict(list)
+MAX_DATA_POINTS = sys.argv[1] if len(sys.argv) > 1 else 1000
+timestamps = defaultdict(lambda: deque(maxlen=MAX_DATA_POINTS))
+values = defaultdict(lambda: deque(maxlen=MAX_DATA_POINTS))
 
 
 def update(i):
@@ -35,7 +36,7 @@ def update(i):
         if not line.startswith('$ '):
             print(line)
             continue
-        data_id, timestamp, value = line.removeprefix('$ ').split()
+        data_id, timestamp, value = line.removeprefix('$ ').split(',')
 
         timestamps[data_id].append(float(timestamp))
         values[data_id].append(float(value))
@@ -50,7 +51,7 @@ def update(i):
     plt.tight_layout()
     
 
-animation = FuncAnimation(plt.gcf(), update, interval=1000, save_count=100)
+animation = FuncAnimation(plt.gcf(), update, interval=50, save_count=100)
 plt.show()
 
 ser.close()
