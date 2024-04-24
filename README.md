@@ -19,10 +19,13 @@ The main concepts in the project explored are:
 - [x] parts for 3 omniwheels
   - [x] 3 \* 16 small rubber coated wheels similar to [these](https://www.aliexpress.com/item/2054027643.html) (+ axis)
   - [x] 3 \* 3 M2x8 screws + nuts
-- [ ] [ProtoBoard](https://www.dfrobot.com/product-660.html) + wires for connecting electronic components
+- [x] [ProtoBoard](https://www.dfrobot.com/product-660.html) + wires for connecting electronic components
 - [x] 6 M3x25 screws (head < 2mm) + nuts for mounting the motors
+- [ ] M30 FF PCB spacer
+- [ ] 8 M3x6 screws for mounting pcb and spacers
+- [ ] Velcro for attaching battery
 - [x] metal housing (could also be 3D printed or omitted)
-- [ ] XBox or other bluetooth controller
+- [x] XBox or other bluetooth controller
 
 ## 3D printed parts
 
