@@ -24,12 +24,17 @@ class MotorDecoder {
   MotorDecoder& operator=(const MotorDecoder&) = delete;
 
   inline int64_t count() const { return _count; }
-  inline uint64_t last_count_micros() const { return _last_count_micros; }
+  inline int64_t sync_count() const { return _syncronized_count; }
+  inline uint64_t last_sync_micros() const { return _last_sync_micros; }
 
  private:
   const uint _pin_a, _pin_b;
+  // The (signed) number of ticks counted by the encoder.
   int64_t _count = 0;
-  uint64_t _last_count_micros = 0;
+  // Same as _count, but only updated on rising edges to ensure consistent timing.
+  int64_t _syncronized_count = _count;
+  // The time in microseconds when _syncronized_count was last updated.
+  uint64_t _last_sync_micros = 0;
 
-  void on_a_change();
+  void on_a_change(bool rising);
 };
