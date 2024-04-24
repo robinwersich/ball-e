@@ -25,13 +25,13 @@ class PidController {
    * @param out_max The maximum value the controlled plant can accept.
    * @param sample_time_millis The time between each control signal computation in milliseconds.
    * @param gains The proportional, integral, and derivative gain for the controller.
-   * @param category The category of this controller.
-   *   In debug mode, tuning parameters will be registered for each category:
-   *   kp_<category>, ki_<category>, kd_<category>
+   * @param category The name of this controller.
+   *   In debug mode, tuning parameters will be registered for each controller with a name:
+   *   kp_<name>, ki_<name>, kd_<name>
    */
   PidController(
     float out_min, float out_max, uint32_t sample_time_millis = 10, PidGains gains = {},
-    const char* category = ""
+    const char* name = ""
   );
 
   ~PidController();
@@ -78,10 +78,10 @@ class PidController {
   float _target = 0.0;
   float _last_measurement = 0.0;
   uint32_t _last_time_millis = 0;
-
 #ifndef NDEBUG
-  static std::multimap<std::string, PidController*> _controllers_by_category;
-  static void register_controller(const std::string& category, PidController* controller);
-  static void unregister_controller(PidController* controller);
+  std::string _name;
+
+  void register_parameters();
+  void unregister_parameters();
 #endif
 };

@@ -16,7 +16,7 @@ int main() {
   auto decoder = std::make_shared<MotorDecoder>(ENCA, ENCB);
   const MotorSpec motor_spec{.ticks_per_revolution = 6, .gear_ratio = 120, .max_rpm = 100};
   const PidGains pid_gains{.kp = 0.0, .ki = 0.0, .kd = 0.0};
-  auto pid_driver = MotorDriverPid(raw_driver, decoder, motor_spec, pid_gains);
+  auto pid_driver = MotorDriverPid(raw_driver, decoder, motor_spec, pid_gains, "motor");
 
   while (true) {
     sleep_ms(2000);
