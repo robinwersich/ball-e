@@ -8,6 +8,8 @@ else()
 endif()
 
 include(pico_sdk_import.cmake)
+# use the modified version of btstack
+include(lib/btcontrol/bluepad32_import.cmake)
 
 project(robot-engineering-project C CXX ASM)
 set(CMAKE_C_STANDARD 11)

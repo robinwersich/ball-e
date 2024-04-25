@@ -113,3 +113,22 @@ pico_enable_stdio_usb(debugging_test 1)
 pico_enable_stdio_uart(debugging_test 0)
 
 pico_add_extra_outputs(debugging_test)
+
+# --- gamepad test ---
+add_executable(gamepad_test
+    gamepad_test.cpp
+)
+
+target_include_directories(gamepad_test PRIVATE
+    ..
+)
+
+target_link_libraries(gamepad_test
+    pico_stdlib
+    btcontrol
+)
+
+pico_enable_stdio_usb(gamepad_test 1)
+pico_enable_stdio_uart(gamepad_test 0)
+
+pico_add_extra_outputs(gamepad_test)

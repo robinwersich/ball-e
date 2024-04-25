@@ -50,9 +50,10 @@ The Raspberry Pi Pico W is programmed in C++ using the official SDK. As the latt
 The following describes the setup using [Visual Studio Code](https://code.visualstudio.com/) but [CLion](https://www.jetbrains.com/de-de/clion/), being CMake-based, should also work well.
 
 1. Set up the Pico SDK using the _Getting Started_ Instructions on the [official website](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html).
-2. Open the repository folder in VS Code. Install the C/C++ Extension and the CMake extension.
-3. Set the `PICO_SDK_PATH` either as global environment variable or in the settings of the CMake extension under _configure environment_.
-4. Configure CMake by pressing `Ctrl`+`Shift`+`P` and search for _CMake: configure_. Choose the GCC arm-non-eabi which was installed in Step 1 as compiler. CMake should then automatically be run and create a `build` folder.
+1. Set up the [Bluepad32 library](https://github.com/ricardoquesada/bluepad32) (steps 2 and 3 of this [guide](https://bluepad32.readthedocs.io/en/latest/plat_picow/))
+1. Open the repository folder in VS Code. Install the C/C++ Extension and the CMake extension.
+1. Set the `PICO_SDK_PATH` and `BLUEPAD32_ROOT` either as global environment variable or in the settings of the CMake extension under _configure environment_.
+1. Configure CMake by pressing `Ctrl`+`Shift`+`P` and search for _CMake: configure_. Choose the GCC arm-non-eabi which was installed in Step 1 as compiler. CMake should then automatically be run and create a `build` folder.
    If you run CMake manually, make sure to pass the `-DPICO_BOARD=pico_w` flag.
-5. Navigate to the `build` folder and execute `make` to build all project files. Use `-j4` to use 4 threads for a faster build.
-6. Connect the Pico while pressing the bootsel button, which should mount is as mass storage device. Then copy the `*.uf2` file to this drive.
+1. Navigate to the `build` folder and execute `make` to build all project files. Use `-j4` to use 4 threads for a faster build.
+1. Connect the Pico while pressing the bootsel button, which should mount is as mass storage device. Then copy the `*.uf2` file to this drive.
