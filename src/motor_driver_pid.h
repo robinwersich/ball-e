@@ -36,14 +36,14 @@ class MotorDriverPid : public MotorDriver {
    * only one instance of this class should exist per motor. For this reason, a shared pointer
    * should be used.
    * @param driver The motor driver to control.
-   * @param decoder The motor decoder to use for measuring the motor speed.
+   * @param decoder_state The motor decoder state to use for measuring the motor speed.
    * @param motor_spec The specifications of the motor.
    * @param pid_gains The proportional, integral, and derivative gains for the PID controller.
    * @param name The name of the controller for debugging purposes.
    *  If given, the PID gains will be registered as tuning parameters with this name.
    */
   MotorDriverPid(
-    std::shared_ptr<MotorDriver> driver, std::shared_ptr<MotorDecoder> decoder,
+    std::shared_ptr<MotorDriver> driver, const MotorDecoderState* decoder_state,
     MotorSpec motor_spec, PidGains pid_gains, const char* name = ""
   );
   /** Unregisters the timer interrupt for updating the controller. */
@@ -68,5 +68,5 @@ class MotorDriverPid : public MotorDriver {
 
   repeating_timer_t _update_timer;
 
-  void update_controllers();
+  void update_controller();
 };

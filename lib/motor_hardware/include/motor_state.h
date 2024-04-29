@@ -9,11 +9,11 @@ class MotorState {
  public:
   /**
    * Creates a new velocity meter.
-   * @param decoder The decoder from which to read ticks.
+   * @param decoder_state The decoder state from which to read ticks.
    * @param ticks_per_revolution The number of ticks the encoder produces per motor revolution.
    * @param gear_ratio How many rotations of the motor are required for one shaft rotation.
    */
-  MotorState(std::shared_ptr<MotorDecoder> decoder, float ticks_per_revolution, float gear_ratio);
+  MotorState(const MotorDecoderState* decoder_state, float ticks_per_revolution, float gear_ratio);
 
   /** Returns the current position in terms of revolutions since start of measurement. */
   double current_position_revs();
@@ -28,8 +28,8 @@ class MotorState {
   float compute_speed_rpm();
 
  private:
-  std::shared_ptr<MotorDecoder> _decoder;
-  uint64_t _last_count_micros = 0;
-  int64_t _last_count = 0;
+  const MotorDecoderState* _decoder_state;
+  uint32_t _last_count_micros = 0;
+  int32_t _last_count = 0;
   float _revolutions_per_tick;  // shaft revolutions
 };

@@ -13,5 +13,4 @@ target_include_directories(motor_hardware PUBLIC
 target_link_libraries(motor_hardware PUBLIC
   pico_stdlib
   hardware_pwm
-  pico_utility
 )

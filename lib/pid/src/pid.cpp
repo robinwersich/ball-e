@@ -81,7 +81,7 @@ float PidController::compute_at_sample_time(float measurement) {
 }
 
 std::optional<float> PidController::compute_if_sample_time(float measurement, float target) {
-  const auto now = us_to_ms(time_us_64());
+  const auto now = us_to_ms(time_us_32());
   const auto dt = now - _last_time_millis;
 
   if (dt < _sample_time_millis) return {};
