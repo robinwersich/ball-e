@@ -8,8 +8,13 @@
 
 class MotorDriverDRI0044 final : public MotorDriver {
  public:
-  MotorDriverDRI0044(uint pwm, uint direction, std::shared_ptr<PwmSlice> pwm_slice);
-  MotorDriverDRI0044(uint pwm, uint direction, uint pwm_frequency);
+  MotorDriverDRI0044(
+    uint pwm_pin, uint direction_pin, std::shared_ptr<PwmSlice> pwm_slice,
+    bool swap_direction = false
+  );
+  MotorDriverDRI0044(
+    uint pwm_pin, uint direction_pin, uint pwm_frequency, bool swap_direction = false
+  );
 
   void drive(float speed) override;
 
@@ -19,5 +24,6 @@ class MotorDriverDRI0044 final : public MotorDriver {
   uint _pin_pwm, _pin_direction;
   std::shared_ptr<PwmSlice> _pwm_slice;
   uint _pwm_channel;
+  bool _swap_direction;
   float _speed = 0.0;
 };

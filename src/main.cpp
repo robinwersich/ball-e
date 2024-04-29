@@ -21,7 +21,7 @@ const uint ENC3B = 11;
 
 int main() {
   std::array wheels = {
-    Omniwheel(30, std::make_unique<MotorDriverDRI0044>(PWM1, DIR1, PWM_FREQUENCY), true),
+    Omniwheel(30, std::make_unique<MotorDriverDRI0044>(PWM1, DIR1, PWM_FREQUENCY, true)),
     Omniwheel(150, std::make_unique<MotorDriverDRI0044>(PWM2, DIR2, PWM_FREQUENCY)),
     Omniwheel(270, std::make_unique<MotorDriverDRI0044>(PWM3, DIR3, PWM_FREQUENCY)),
   };
