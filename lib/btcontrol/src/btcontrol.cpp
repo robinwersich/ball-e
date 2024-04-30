@@ -10,8 +10,13 @@ static std::function<void(const uni_keyboard_t&)> on_keyboard_data;
 static void platform_init(int argc, const char** argv) {
   ARG_UNUSED(argc);
   ARG_UNUSED(argv);
-
   logi("btcontrol: initializing...\n");
+
+  // make y axis point up in order to get a mathematical coordinate system
+  uni_gamepad_mappings_t mappings = GAMEPAD_DEFAULT_MAPPINGS;
+  mappings.axis_y_inverted = true;
+  mappings.axis_ry_inverted = true;
+  uni_gamepad_set_mappings(&mappings);
 }
 
 static void platform_on_init_complete(void) {

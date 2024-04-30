@@ -8,9 +8,8 @@ add_executable(robot_firmware
 
 target_link_libraries(robot_firmware
     pico_stdlib
-    hardware_pwm
     motor_hardware
-    pid
+    btcontrol
 )
 
 pico_add_extra_outputs(robot_firmware)
