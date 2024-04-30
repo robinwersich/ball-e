@@ -1,7 +1,10 @@
 #include "motor_decoder.h"
+#include "motor_drivers/dri0044.h"
+#include "parameters.h"
 #include "pico/stdlib.h"
 #include "plot.h"
 
+const uint PWM_FREQUENCY = 25000;
 // -- motor 1 --
 const uint DIR1 = 0;
 const uint PWM1 = 1;
@@ -18,9 +21,19 @@ const uint ENC3_SLOT = 5;
 int main() {
   stdio_init_all();
 
-  auto decoder1 = MotorDecoder(ENC1_SLOT);
-  auto decoder2 = MotorDecoder(ENC2_SLOT);
-  auto decoder3 = MotorDecoder(ENC3_SLOT);
+  MotorDriverDRI0044 motor1{PWM1, DIR1, PWM_FREQUENCY, true};
+  MotorDriverDRI0044 motor2{PWM2, DIR2, PWM_FREQUENCY};
+  MotorDriverDRI0044 motor3{PWM3, DIR3, PWM_FREQUENCY};
+  MotorDecoder decoder1{ENC1_SLOT, true};
+  MotorDecoder decoder2{ENC2_SLOT};
+  MotorDecoder decoder3{ENC3_SLOT, true};
+
+  parameters::register_parameter("speed", [&](float speed) {
+    motor1.drive(speed);
+    motor2.drive(speed);
+    motor3.drive(speed);
+  });
+  parameters::start_updating();
 
   while (true) {
     sleep_ms(50);
