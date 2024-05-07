@@ -18,13 +18,18 @@ The main concepts in the project explored are:
 - [x] 1 [IMU](https://www.pololu.com/product/2863)
 - [x] parts for 3 omniwheels
   - [x] 3 \* 16 small rubber coated wheels similar to [these](https://www.aliexpress.com/item/2054027643.html) (+ axis)
-  - [x] 3 \* 3 M2x8 screws + nuts
+  - [x] 3 \* 3 M2x8 bolts + nuts
 - [x] [ProtoBoard](https://www.dfrobot.com/product-660.html) + wires for connecting electronic components
-- [x] 6 M3x25 screws (head < 2mm) + nuts for mounting the motors
-- [ ] M30 FF PCB spacer
-- [ ] 8 M3x6 screws for mounting pcb and spacers
+- [x] several pin headers (MM and MF)
+- [x] 2 M2 threaded heat inserts
+- [x] 2 M2x3 bolts for securing the IMU
+- [x] 6 M3x25 and 3 M2.5x15 bolts + nuts for mounting the motors
+- [x] 4 M3 threaded heat inserts
+- [x] 3 M3x6 Bolts for mounting the case
+- [x] 4 M30 FF PCB spacer
+- [x] 7 M3x6 bolts and 1 M3x10 headless bolt for mounting pcb and spacers
 - [ ] Velcro for attaching battery
-- [x] metal housing (could also be 3D printed or omitted)
+- [x] metal case
 - [x] XBox or other bluetooth controller
 
 ## 3D printed parts
