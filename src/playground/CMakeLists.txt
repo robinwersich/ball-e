@@ -132,3 +132,23 @@ pico_enable_stdio_usb(gamepad_test 1)
 pico_enable_stdio_uart(gamepad_test 0)
 
 pico_add_extra_outputs(gamepad_test)
+
+# --- IMU test ---
+add_executable(imu_test
+    imu_test.cpp
+)
+
+target_include_directories(imu_test PRIVATE
+    ..
+)
+
+target_link_libraries(imu_test
+    pico_stdlib
+    imu
+    debugging
+)
+
+pico_enable_stdio_usb(imu_test 1)
+pico_enable_stdio_uart(imu_test 0)
+
+pico_add_extra_outputs(imu_test)
