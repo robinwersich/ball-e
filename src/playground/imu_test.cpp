@@ -16,14 +16,14 @@ int main() {
 
   while (true) {
     if (imu.is_new_data_available(true, true)) {
-      const auto acc = imu.read_acceleration();
-      const auto rot = imu.read_rotation();
-      plot("acc_x", acc.x);
-      plot("acc_y", acc.y);
-      plot("acc_z", acc.z);
-      plot("rot_x", rot.x);
-      plot("rot_y", rot.y);
-      plot("rot_z", rot.z);
+      const auto acc = imu.read_acceleration_raw();
+      const auto rot = imu.read_rotation_raw();
+      plot("acc_x", acc.x());
+      plot("acc_y", acc.y());
+      plot("acc_z", acc.z());
+      plot("rot_x", rot.x());
+      plot("rot_y", rot.y());
+      plot("rot_z", rot.z());
     }
   }
 }

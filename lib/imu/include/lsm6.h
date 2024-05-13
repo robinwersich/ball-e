@@ -1,13 +1,8 @@
 #pragma once
 
 #include "hardware/i2c.h"
+#include "matrix.h"
 #include "pico/types.h"
-
-struct Vector {
-  int16_t x;
-  int16_t y;
-  int16_t z;
-};
 
 class LSM6 {
  public:
@@ -82,11 +77,15 @@ class LSM6 {
   /** Returns true if any of the specified data is newly available. */
   bool is_new_data_available(bool acceleration = true, bool rotation = true) const;
 
-  /** Returns the current linear acceleration. */
-  Vector read_acceleration() const;
+  /** Returns the raw value of the current linear acceleration. */
+  Vector3D<int16_t> read_acceleration_raw() const;
+  /** Returns the current linear acceleration in g. */
+  Vector3D<float> read_acceleration() const;
 
-  /** Returns the current angular velocity. */
-  Vector read_rotation() const;
+  /** Returns the raw value of the current angular velocity. */
+  Vector3D<int16_t> read_rotation_raw() const;
+  /** Returns the current angular velocity in dps. */
+  Vector3D<float> read_rotation() const;
 
  private:
   i2c_inst_t* _i2c_port;

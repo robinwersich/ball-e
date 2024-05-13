@@ -61,25 +61,25 @@ bool LSM6::is_new_data_available(bool acceleration, bool rotation) const {
   return (acceleration && (status & 0x01)) || (rotation && (status & 0x02));
 }
 
-Vector LSM6::read_acceleration() const {
+Vector3D<int16_t> LSM6::read_acceleration_raw() const {
   uint8_t data[6];
   read(ACCEL_OUT, data, 6);
 
   return {
-    .x = static_cast<int16_t>((data[1] << 8) | data[0]),
-    .y = static_cast<int16_t>((data[3] << 8) | data[2]),
-    .z = static_cast<int16_t>((data[5] << 8) | data[4]),
+    static_cast<int16_t>((data[1] << 8) | data[0]),
+    static_cast<int16_t>((data[3] << 8) | data[2]),
+    static_cast<int16_t>((data[5] << 8) | data[4]),
   };
 }
 
-Vector LSM6::read_rotation() const {
+Vector3D<int16_t> LSM6::read_rotation_raw() const {
   uint8_t data[6];
   read(GYRO_OUT, data, 6);
 
   return {
-    .x = static_cast<int16_t>((data[1] << 8) | data[0]),
-    .y = static_cast<int16_t>((data[3] << 8) | data[2]),
-    .z = static_cast<int16_t>((data[5] << 8) | data[4]),
+    static_cast<int16_t>((data[1] << 8) | data[0]),
+    static_cast<int16_t>((data[3] << 8) | data[2]),
+    static_cast<int16_t>((data[5] << 8) | data[4]),
   };
 }
 

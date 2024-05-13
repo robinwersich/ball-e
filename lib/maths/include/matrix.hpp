@@ -4,12 +4,6 @@
 #include "matrix.h"
 
 template <typename T, unsigned Rows, unsigned Cols>
-Matrix<T, Rows, Cols>::Matrix() : data{} {}
-
-template <typename T, unsigned Rows, unsigned Cols>
-Matrix<T, Rows, Cols>::Matrix(const std::array<T, Rows * Cols>& data) : data{data} {}
-
-template <typename T, unsigned Rows, unsigned Cols>
 Matrix<T, Rows, Cols> Matrix<T, Rows, Cols>::identity()
   requires(Rows == Cols)
 {
@@ -34,19 +28,20 @@ Matrix<T, Rows, Cols> Matrix<T, Rows, Cols>::rotate(float degrees)
 }
 
 template <typename T, unsigned Rows, unsigned Cols>
-T& Matrix<T, Rows, Cols>::operator()(unsigned row, unsigned col) {
-  return data[row * Cols + col];
-}
-
-template <typename T, unsigned Rows, unsigned Cols>
-const T& Matrix<T, Rows, Cols>::operator()(unsigned row, unsigned col) const {
-  return data[row * Cols + col];
-}
-
-template <typename T, unsigned Rows, unsigned Cols>
 Matrix<T, Rows, Cols> Matrix<T, Rows, Cols>::operator+(const Matrix<T, Rows, Cols>& other) const {
   Matrix<T, Rows, Cols> result;
-  std::transform(data.begin(), data.end(), other.data.begin(), result.data.begin(), std::plus<T>());
+  std::transform(data.begin(), data.end(), other.data.begin(), result.data.begin(), [](T a, T b) {
+    return a + b;
+  });
+  return result;
+}
+
+template <typename T, unsigned Rows, unsigned Cols>
+Matrix<T, Rows, Cols> Matrix<T, Rows, Cols>::operator*(T scalar) const {
+  Matrix<T, Rows, Cols> result;
+  std::transform(data.begin(), data.end(), result.data.begin(), [scalar](T value) {
+    return value * scalar;
+  });
   return result;
 }
 
