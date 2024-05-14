@@ -20,6 +20,7 @@ The main concepts in the project explored are:
   - [x] 3 \* 16 small rubber coated wheels similar to [these](https://www.aliexpress.com/item/2054027643.html) (+ axis)
   - [x] 3 \* 3 M2x8 bolts + nuts
 - [x] [ProtoBoard](https://www.dfrobot.com/product-660.html) + wires for connecting electronic components
+- [x] 6 10-33nF capacitors
 - [x] several pin headers (MM and MF)
 - [x] 2 M2 threaded heat inserts
 - [x] 2 M2x3 bolts for securing the IMU
@@ -38,8 +39,9 @@ The following parts are 3D-printed:
 
 - omniwheels (partly)
 - robot framework
+- IMU mount
 
-A 3D model with all printed and non-preinted parts can be found [here](https://cad.onshape.com/documents/aef269c9421a5698f51293a2/w/28d1817e881a7e140ad68222/e/52373abffadf50390ef456f1).
+A 3D model with all printed and non-printed parts can be found [here](https://cad.onshape.com/documents/aef269c9421a5698f51293a2/w/28d1817e881a7e140ad68222/e/52373abffadf50390ef456f1).
 In addition, exported _STEP_ files are available in the `CAD` folder.
 
 ## Wiring
