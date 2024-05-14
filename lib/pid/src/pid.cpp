@@ -8,16 +8,12 @@
 #endif
 #include "pico/stdlib.h"
 
-PidController::PidController(
-  float out_min, float out_max, uint32_t sample_time_millis, PidGains gains, const char* name
-)
+PidController::PidController(float out_min, float out_max, PidGains gains, const char* name)
   : _out_min{out_min}
   , _out_max{out_max}
-  , _sample_time_millis{sample_time_millis}
-  , _kp{gains.kp}  // Multiplying ki by sample time allows omitting it in the compute function
-  , _ki{gains.ki * sample_time_millis}
-  // Dividing kd by sample time allows omitting it in the compute function
-  , _kd{gains.kd / sample_time_millis}
+  , _kp{gains.kp}
+  , _ki{gains.ki / 10e6f}  // convert from C/(M*s) to C/(M*us)
+  , _kd{gains.kd * 10e6f}  // convert from C/(M/s) to C/(M/us)
 #ifndef NDEBUG
   , _name{name} {
   register_parameters();
@@ -40,28 +36,29 @@ void PidController::set_gains(PidGains gains) {
 }
 
 void PidController::set_proportional_gain(float kp) { _kp = kp; }
-void PidController::set_integral_gain(float ki) { _ki = ki * _sample_time_millis; }
-void PidController::set_derivative_gain(float kd) { _kd = kd / _sample_time_millis; }
+void PidController::set_integral_gain(float ki) { _ki = ki / 10e6f; }
+void PidController::set_derivative_gain(float kd) { _kd = kd * 10e6f; }
 
 void PidController::set_target(float target) { _target = target; }
 
-float PidController::compute_at_sample_time(float measurement, float target) {
+float PidController::compute(float measurement, float target) {
   _target = target;
-  return compute_at_sample_time(measurement);
+  return compute(measurement);
 }
 
-float PidController::compute_at_sample_time(float measurement) {
+float PidController::compute(float measurement) {
   const auto error = _target - measurement;
+  const auto now = time_us_32();
+  const auto dt = (now - _last_time_millis);
+  _last_time_millis = now;
 
-  // multiplication by (constant) dt is part of ki
-  _scaled_error_sum += (error + _last_error) / 2 * _ki;
+  _i_term += (error + _last_error) / 2 * dt * _ki;
   // prevent integral windup
-  _scaled_error_sum = std::clamp(_scaled_error_sum, _out_min, _out_max);
+  _i_term = std::clamp(_i_term, _out_min, _out_max);
   // derivative on measurement (not error) to prevent derivative kick
-  // multiplication by (constant) dt is part of kd
-  const auto measurement_change = measurement - _last_measurement;
+  const auto measurement_change = (measurement - _last_measurement) / dt;
   const auto p_term = error * _kp;
-  const auto i_term = _scaled_error_sum;
+  const auto i_term = _i_term;
   const auto d_term = -measurement_change * _kd;
 
   _last_error = error;
@@ -78,20 +75,6 @@ float PidController::compute_at_sample_time(float measurement) {
 #endif
 
   return output;
-}
-
-std::optional<float> PidController::compute_if_sample_time(float measurement, float target) {
-  const auto now = us_to_ms(time_us_32());
-  const auto dt = now - _last_time_millis;
-
-  if (dt < _sample_time_millis) return {};
-
-  _last_time_millis = now;
-  return compute_at_sample_time(measurement, target);
-}
-
-std::optional<float> PidController::compute_if_sample_time(float measurement) {
-  return compute_if_sample_time(measurement, _target);
 }
 
 #ifndef NDEBUG

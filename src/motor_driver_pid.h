@@ -39,6 +39,8 @@ class MotorDriverPid : public MotorDriver {
    * @param decoder_state The motor decoder state to use for measuring the motor speed.
    * @param motor_spec The specifications of the motor.
    * @param pid_gains The proportional, integral, and derivative gains for the PID controller.
+   *  Units are VM/(rev/s), VM/rev, and VM/(rev/s²) for kp, ki, and kd respectively.
+   *  where VM is the maximum output voltage of the motor driver.
    * @param name The name of the controller for debugging purposes.
    *  If given, the PID gains will be registered as tuning parameters with this name.
    */

@@ -8,8 +8,14 @@
 
 #include "pico/types.h"
 
+/** The PID gains are defined in units based on the measurement unit M and control signal unit C. */
 struct PidGains {
-  float kp = 0.0, ki = 0.0, kd = 0.0;
+  /** Proportional gain in C/M. */
+  float kp = 0.0;
+  /** Integral gain in C/(M*s). */
+  float ki = 0.0;
+  /** Derivative gain in C/(M/s). */
+  float kd = 0.0;
 };
 
 /**
@@ -23,16 +29,12 @@ class PidController {
    * Creates a new PID controller.
    * @param out_min The minimum value the controlled plant can accept.
    * @param out_max The maximum value the controlled plant can accept.
-   * @param sample_time_millis The time between each control signal computation in milliseconds.
    * @param gains The proportional, integral, and derivative gain for the controller.
    * @param category The name of this controller.
    *   In debug mode, tuning parameters will be registered for each controller with a name:
    *   kp_<name>, ki_<name>, kd_<name>
    */
-  PidController(
-    float out_min, float out_max, uint32_t sample_time_millis = 10, PidGains gains = {},
-    const char* name = ""
-  );
+  PidController(float out_min, float out_max, PidGains gains = {}, const char* name = "");
 
   ~PidController();
 
@@ -46,34 +48,16 @@ class PidController {
 
   void set_target(float target);
 
-  /**
-   * Computes the control signal based on a measurement and target and updates the target.
-   * This function must be called exactly once per sample time set by set_sample_time.
-   */
-  float compute_at_sample_time(float measurement, float target);
-  /**
-   * Computes the control signal based on the given measurement and the previously set target.
-   * This function must be called exactly once per sample time set by set_sample_time.
-   */
-  float compute_at_sample_time(float measurement);
-  /**
-   * Computes the control signal based on a measurement and target and updates the target.
-   * This function must be called in every loop iteration and checks if the sample time has passed.
-   * @returns A bool if a new output has been computed and the new output value (if computed).
-   */
-  std::optional<float> compute_if_sample_time(float measurement, float target);
-  /**
-   * Computes the control signal based on the given measurement and the previously set target.
-   * This function must be called in every loop iteration and checks if the sample time has passed.
-   * @returns A bool if a new output has been computed and the new output value (if computed).
-   */
-  std::optional<float> compute_if_sample_time(float measurement);
+  /** Computes the control signal based on a measurement and target and updates the target. */
+  float compute(float measurement, float target);
+  /** Computes the control signal based on the given measurement and the previously set target. */
+  float compute(float measurement);
 
  private:
   uint32_t _sample_time_millis;
-  float _kp, _ki, _kd;
+  float _kp, _ki, _kd;  // gains in C/M, C/(M*us), C/(M/us) to avoid unnecessary computations
   float _out_min, _out_max;
-  float _scaled_error_sum = 0.0;  // already multiplied by ki
+  float _i_term = 0.0;  // error sum multiplied by ki
   float _last_error = 0.0;
   float _target = 0.0;
   float _last_measurement = 0.0;
