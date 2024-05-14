@@ -14,11 +14,13 @@ class OrientationEstimator {
    */
   bool update();
 
-  /** Returns the current orientation estimate. */
-  const Vector2D<float>& orientation() const { return _orientation; }
+  /**
+   * Returns the current orientation estimate.
+   */
+  const Eigen::Vector2f& orientation() const { return _orientation; }
 
  private:
   std::shared_ptr<LSM6> _imu;
-  Vector2D<float> _orientation;
+  Eigen::Vector2f _orientation;
   uint32_t _last_update = 0;
 };

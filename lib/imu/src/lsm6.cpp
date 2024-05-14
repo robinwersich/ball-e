@@ -61,7 +61,7 @@ bool LSM6::is_new_data_available(bool acceleration, bool rotation) const {
   return (acceleration && (status & 0x01)) || (rotation && (status & 0x02));
 }
 
-Vector3D<int16_t> LSM6::read_acceleration_raw() const {
+Eigen::Vector3<int16_t> LSM6::read_acceleration_raw() const {
   uint8_t data[6];
   read(ACCEL_OUT, data, 6);
 
@@ -72,7 +72,7 @@ Vector3D<int16_t> LSM6::read_acceleration_raw() const {
   };
 }
 
-Vector3D<int16_t> LSM6::read_rotation_raw() const {
+Eigen::Vector3<int16_t> LSM6::read_rotation_raw() const {
   uint8_t data[6];
   read(GYRO_OUT, data, 6);
 

@@ -10,7 +10,7 @@ target_link_libraries(robot_firmware
     pico_stdlib
     motor_hardware
     btcontrol
-    maths
+    imu
 )
 
 pico_add_extra_outputs(robot_firmware)

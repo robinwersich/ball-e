@@ -1,9 +1,10 @@
 #pragma once
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <memory>
 #include <utility>
 
-#include "matrix.h"
 #include "motor_driver.h"
 
 /**
@@ -39,8 +40,8 @@ class Omniwheel {
   void stop() const;
 
  private:
-  /** The conversion matrix from the global coordinate system to the wheel coordinate system */
-  Matrix<float, 2, 2> _transform;
+  /** The conversion from the global coordinate system to the wheel coordinate system */
+  Eigen::Rotation2Df _wheel_rotation;
   std::unique_ptr<MotorDriver> _motor_driver;
   bool _swap_direction;
 };

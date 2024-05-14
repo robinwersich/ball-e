@@ -17,5 +17,12 @@ set(CMAKE_CXX_STANDARD 23)
 
 pico_sdk_init()
 
+if (DEFINED ENV{Eigen3_DIR} AND (NOT Eigen3_DIR))
+    set(Eigen3_DIR $ENV{Eigen3_DIR})
+    message("Using Eigen3_DIR from environment ('${Eigen3_DIR}')")
+endif ()
+
+find_package(Eigen3 REQUIRED CONFIG)
+
 add_subdirectory(lib)
 add_subdirectory(src)
