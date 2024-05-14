@@ -152,3 +152,24 @@ pico_enable_stdio_usb(imu_test 1)
 pico_enable_stdio_uart(imu_test 0)
 
 pico_add_extra_outputs(imu_test)
+
+
+# --- orientation test ---
+add_executable(orientation_test
+    orientation_test.cpp
+)
+
+target_include_directories(orientation_test PRIVATE
+    ..
+)
+
+target_link_libraries(orientation_test
+    pico_stdlib
+    imu
+    debugging
+)
+
+pico_enable_stdio_usb(orientation_test 1)
+pico_enable_stdio_uart(orientation_test 0)
+
+pico_add_extra_outputs(orientation_test)
