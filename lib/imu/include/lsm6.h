@@ -85,7 +85,11 @@ class LSM6 {
 
   /** Returns the raw value of the current angular velocity. */
   Eigen::Vector3<int16_t> read_rotation_raw() const;
-  /** Returns the current angular velocity in dps. */
+  /**
+   * Returns the current angular velocity in dps.
+   * The vector can be interpreted as individual rotations about x, y and z,
+   * but also as an axis-angle representation of the rotation.
+   */
   Eigen::Vector3f read_rotation() const;
 
  private:
