@@ -3,6 +3,7 @@
 import threading
 import argparse
 from collections import defaultdict, deque
+from matplotlib.quiver import Quiver
 from serial import Serial, SerialException
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -43,7 +44,16 @@ class Plotter:
 class VectorViewer:
     def __init__(self, serial: Serial):
         self.serial = serial
-        self.vectors = {}
+        self.quivers: dict[str, Quiver] = {}
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, projection='3d')
+        self.ax.set_xlim(-1, 1)
+        self.ax.set_ylim(-1, 1)
+        self.ax.set_zlim(-1, 1)
+        self.ax.quiver(0, 0, 0, 1, 0, 0, color='r', label='x', arrow_length_ratio=0.1)
+        self.ax.quiver(0, 0, 0, 0, 1, 0, color='g', label='y', arrow_length_ratio=0.1)
+        self.ax.quiver(0, 0, 0, 0, 0, 1, color='b', label='z', arrow_length_ratio=0.1)
+        self.animation = FuncAnimation(self.fig, self.update, interval=50, save_count=100)
 
     def update(self, i):
         while self.serial.in_waiting > 0:
@@ -52,17 +62,9 @@ class VectorViewer:
                 print(line)
                 continue
             data_id, x, y, z = line.removeprefix('$v ').split(',')
-            self.vectors[data_id] = (float(x), float(y), float(z))
-        
-        if not self.vectors:
-            return
-        
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        for data_id, (x, y, z) in self.vectors.items():
-            ax.quiver(0, 0, 0, x, y, z, label=data_id)
-        ax.legend()
-        plt.tight_layout()
+            if data_id in self.quivers:
+                self.quivers[data_id].remove()
+            self.quivers[data_id] = self.ax.quiver(0, 0, 0, float(x), float(y), float(z), label=data_id)
 
     def show(self):
         plt.show()
