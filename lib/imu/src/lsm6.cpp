@@ -22,7 +22,10 @@ enum Register : uint8_t {
 }
 
 LSM6::LSM6(uint8_t slot, const AccelConfig& accel_config, const GyroConfig& gyro_config, bool sa0)
-  : _i2c_port{slot % 2 == 0 ? i2c0 : i2c1}, _address{static_cast<uint8_t>(I2C_ADDRESS | sa0)} {
+  : _i2c_port{slot % 2 == 0 ? i2c0 : i2c1}
+  , _address{static_cast<uint8_t>(I2C_ADDRESS | sa0)}
+  , _accel_scale{accel_config.fs.range / std::numeric_limits<int16_t>::max()}
+  , _gyro_scale{gyro_config.fs.range / std::numeric_limits<int16_t>::max()} {
   const auto pin_sda = 2 * slot;
   const auto pin_scl = 2 * slot + 1;
 
@@ -30,11 +33,11 @@ LSM6::LSM6(uint8_t slot, const AccelConfig& accel_config, const GyroConfig& gyro
   gpio_set_function(pin_sda, GPIO_FUNC_I2C);
   gpio_set_function(pin_scl, GPIO_FUNC_I2C);
 
-  const uint8_t CTRL1_XL_val = static_cast<uint8_t>(accel_config.odr) << 4
-                             | static_cast<uint8_t>(accel_config.fs) << 2
+  const uint8_t CTRL1_XL_val = static_cast<uint8_t>(accel_config.odr.code) << 4
+                             | static_cast<uint8_t>(accel_config.fs.code) << 2
                              | (accel_config.low_pass ? 1 : 0) << 1;
-  const uint8_t CTRL2_G_val =
-    static_cast<uint8_t>(gyro_config.odr) << 4 | static_cast<uint8_t>(gyro_config.fs) << 1;
+  const uint8_t CTRL2_G_val = static_cast<uint8_t>(gyro_config.odr.code) << 4
+                            | static_cast<uint8_t>(gyro_config.fs.code) << 1;
 
   sleep_ms(100);
   write(CTRL1_XL, &CTRL1_XL_val, 1);
@@ -70,6 +73,14 @@ Eigen::Vector3<int16_t> LSM6::read_acceleration_raw() const {
     static_cast<int16_t>((data[3] << 8) | data[2]),
     static_cast<int16_t>((data[5] << 8) | data[4]),
   };
+}
+
+Eigen::Vector3f LSM6::read_acceleration() const {
+  return read_acceleration_raw().cast<float>() * _accel_scale;
+}
+
+Eigen::Vector3f LSM6::read_rotation() const {
+  return read_rotation_raw().cast<float>() * _gyro_scale;
 }
 
 Eigen::Vector3<int16_t> LSM6::read_rotation_raw() const {

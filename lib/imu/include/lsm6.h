@@ -5,55 +5,71 @@
 #include "hardware/i2c.h"
 #include "pico/types.h"
 
+namespace lsm6 {
+
+/** Output data rate. */
+struct ODR {
+  float frequency;
+  uint8_t code;
+};
+/** Full scale range for accelerometer. */
+struct AccFS {
+  float range;
+  uint8_t code;
+};
+/** Full scale range for gyroscope. */
+struct GyroFS {
+  float range;
+  uint8_t code;
+};
+
+namespace odr {
+constexpr ODR POWER_DOWN = {0, 0b0000};
+constexpr ODR HZ_1_6 = {1, 0b1011};  // low power only
+constexpr ODR HZ_12_5 = {12, 0b0001};
+constexpr ODR HZ_26 = {26, 0b0010};
+constexpr ODR HZ_52 = {52, 0b0011};
+constexpr ODR HZ_104 = {104, 0b0100};
+constexpr ODR HZ_208 = {208, 0b0101};
+constexpr ODR HZ_416 = {416, 0b0110};
+constexpr ODR HZ_833 = {833, 0b0111};
+constexpr ODR KHZ_1_66 = {1666, 0b1000};
+constexpr ODR KHZ_3_33 = {3333, 0b1001};
+constexpr ODR KHZ_6_66 = {6666, 0b1010};
+}
+
+namespace fs::acc {
+constexpr AccFS G_2 = {2, 0b00};
+constexpr AccFS G_4 = {4, 0b10};
+constexpr AccFS G_8 = {8, 0b11};
+constexpr AccFS G_16 = {16, 0b01};
+}
+
+namespace fs::gyro {
+constexpr GyroFS DPS_125 = {125, 0b001};
+constexpr GyroFS DPS_250 = {250, 0b000};
+constexpr GyroFS DPS_500 = {500, 0b010};
+constexpr GyroFS DPS_1000 = {1000, 0b100};
+}
+
+}
+
 class LSM6 {
  public:
-  /** Output Data Rate */
-  enum class ODR : uint8_t {
-    POWER_DOWN = 0b0000,
-    HZ_1_6 = 0b1011,  // low power only
-    HZ_12_5 = 0b0001,
-    HZ_26 = 0b0010,
-    HZ_52 = 0b0011,
-    HZ_104 = 0b0100,
-    HZ_208 = 0b0101,
-    HZ_416 = 0b0110,
-    HZ_833 = 0b0111,
-    KHZ_1_66 = 0b1000,
-    KHZ_3_33 = 0b1001,
-    KHZ_6_66 = 0b1010,
-  };
-
   struct AccelConfig {
-    /** Full scale (range) of the acceleration. */
-    enum class FS : uint8_t {
-      G_2 = 0b00,
-      G_4 = 0b10,
-      G_8 = 0b11,
-      G_16 = 0b01,
-    };
-
     /** Acceleration output data rate. */
-    ODR odr = ODR::HZ_104;
+    lsm6::ODR odr = lsm6::odr::HZ_104;
     /** Range of the acceleration. */
-    FS fs = FS::G_2;
+    lsm6::AccFS fs = lsm6::fs::acc::G_2;
     /** Enable low-pass filter for acceleration. */
     bool low_pass = false;
   };
 
   struct GyroConfig {
-    /** Full scale (range) of the angular velocity. */
-    enum class FS : uint8_t {
-      DPS_125 = 0b001,
-      DPS_250 = 0b000,
-      DPS_500 = 0b010,
-      DPS_1000 = 0b100,
-      DPS_2000 = 0b110,
-    };
-
     /** Angular velocity output data rate. */
-    ODR odr = ODR::HZ_104;
+    lsm6::ODR odr = lsm6::odr::HZ_104;
     /** Range of the angular velocity. */
-    FS fs = FS::DPS_250;
+    lsm6::GyroFS fs = lsm6::fs::gyro::DPS_250;
   };
 
   /**
@@ -95,6 +111,8 @@ class LSM6 {
  private:
   i2c_inst_t* _i2c_port;
   uint8_t _address;
+  float _accel_scale;
+  float _gyro_scale;
 
   void read(uint8_t reg, uint8_t* data, size_t len) const;
   void write(uint8_t reg, const uint8_t* data, size_t len) const;
