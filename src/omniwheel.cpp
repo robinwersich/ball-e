@@ -3,7 +3,7 @@
 #include <cmath>
 
 Omniwheel::Omniwheel(float angle, std::unique_ptr<MotorDriver> motor_driver, bool swap_direction)
-  : _wheel_rotation{Eigen::Rotation2Df(angle * M_PI / 180)}
+  : _wheel_rotation{Eigen::Rotation2Df(-angle * M_PI / 180)}
   , _motor_driver{std::move(motor_driver)}
   , _swap_direction{swap_direction} {}
 
