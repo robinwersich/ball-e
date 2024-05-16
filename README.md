@@ -9,35 +9,41 @@ The main concepts in the project explored are:
 - 3D printing
 - hardware selection and wiring
 
-## Hardware List
+## Hardware BOM
 
-- [x] 1 [Raspberry Pi Pico W](https://www.raspberrypi.com/products/raspberry-pi-pico/)
-- [x] 3 [motors with encoders](https://gopigo.io/gopigo3-motor-replacement-kit/) (but similar motors would work, too)
-- [x] 2 [Dual DC motor drivers](https://www.tme.eu/ee/en/details/df-dri0044/motor-control-modules/dfrobot/dri0044/)
-- [x] 1 12V battery pack
-- [x] 1 [IMU](https://www.pololu.com/product/2863)
-- [x] parts for 3 omniwheels
-  - [x] 3 \* 16 small rubber coated wheels similar to [these](https://www.aliexpress.com/item/2054027643.html) (+ axis)
-  - [x] 3 \* 3 M2x8 bolts + nuts
-- [x] [ProtoBoard](https://www.dfrobot.com/product-660.html) + wires for connecting electronic components
-- [x] 6 10-33nF capacitors
-- [x] several pin headers (MM and MF)
-- [x] 2 M2 threaded heat inserts
-- [x] 2 M2x3 bolts for securing the IMU
-- [x] 6 M3x25 and 3 M2.5x15 bolts + nuts for mounting the motors
-- [x] 4 M3 threaded heat inserts
-- [x] 3 M3x6 Bolts for mounting the case
-- [x] 4 M30 FF PCB spacer
-- [x] 7 M3x6 bolts and 1 M3x10 headless bolt for mounting pcb and spacers
-- [ ] Velcro for attaching battery
-- [x] metal case
-- [x] XBox or other bluetooth controller
+- 3 [motors with encoders](https://gopigo.io/gopigo3-motor-replacement-kit/)
+- 3 motor connector cables: 6-pin (0.2mm spacing) to 6-pin (0.254mm spacing), ~8cm length
+- 1 [Raspberry Pi Pico W](https://www.raspberrypi.com/products/raspberry-pi-pico/)
+- 2 [Dual DC motor drivers](https://www.tme.eu/ee/en/details/df-dri0044/motor-control-modules/dfrobot/dri0044/)
+- 1 [IMU](https://www.pololu.com/product/2863)
+- 1 12V battery pack
+- parts for 3 omniwheels
+  - 3 \* 16 small rubber coated wheels similar to [these](https://www.aliexpress.com/item/2054027643.html) (+ axis)
+  - 3 \* 3 M2x8 bolts + nuts
+- control board
+  - [ProtoBoard](https://www.dfrobot.com/product-660.html)
+  - 6 10-33nF capacitors
+  - 2 screw terminals (2 pins each)
+  - MF headers: 2x 20-pin, 2x 14-pin, 1x 5-pin, 3x 6-pin
+  - MM headers: 2x 3-pin
+  - 2 M2 threaded heat inserts
+  - 2 M2x3 bolts for securing the IMU
+  - 0.28mm² insulated wire (black, red, green, white)
+  - 0.75mm² insulated wire (black, red)
+- battery connector: 9x5x5 barrel jack to 2x2 pin headers, 15cm length, 0.75mm²
+- 6 M3x25 and 3 M2.5x15 bolts + nuts for mounting the motors
+- 4 M30 FF PCB spacer
+- 4 M3 threaded heat inserts
+- 10 M3x6 bolts and 1 M3x10 headless bolt for mounting case, pcb and spacers
+- 2cm Velcro for attaching battery
+- metal case (150x150x90)
+- bluetooth gamepad
 
 ## 3D printed parts
 
 The following parts are 3D-printed:
 
-- omniwheels (partly)
+- 3x omniwheels (partly)
 - robot framework
 - IMU mount
 
