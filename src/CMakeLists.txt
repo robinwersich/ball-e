@@ -11,6 +11,10 @@ target_link_libraries(robot_firmware
     motor_hardware
     btcontrol
     imu
+    pid
 )
+
+pico_enable_stdio_usb(robot_firmware 1)
+pico_enable_stdio_uart(robot_firmware 0)
 
 pico_add_extra_outputs(robot_firmware)

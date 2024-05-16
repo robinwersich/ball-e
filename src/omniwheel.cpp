@@ -8,8 +8,11 @@ Omniwheel::Omniwheel(float angle, std::unique_ptr<MotorDriver> motor_driver, boo
   , _swap_direction{swap_direction} {}
 
 void Omniwheel::drive(float x, float y) const {
-  const auto speed = _wheel_rotation * Eigen::Vector2f{{x, y}};
-  drive(speed.y());
+  auto v = _wheel_rotation * Eigen::Vector2f{{x, y}};
+  // ensure that total speed is not higher than 1
+  const auto speed = v.norm();
+  if (speed > 1) v /= speed;
+  drive(v.y());
 }
 
 void Omniwheel::drive(float speed) const { _motor_driver->drive(_swap_direction ? -speed : speed); }
