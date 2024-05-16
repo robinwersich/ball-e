@@ -29,7 +29,7 @@ struct MotorSpec {
 class MotorDriverPid : public MotorDriver {
  public:
   /** Rate for sampling and adjusting the motor velocity */
-  static const uint32_t sample_time_millis = 50;
+  static const uint32_t sample_time_millis = 10;
 
   /**
    * Creates a new pid motor driver. As this will register an interrupt for the PID controller,

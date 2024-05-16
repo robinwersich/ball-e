@@ -25,7 +25,7 @@ int main() {
   parameters::start_updating();
 
   while (true) {
-    sleep_ms(50);
+    sleep_ms(10);
     plot("speed", motor_state.compute_speed_rpm());
   }
 
