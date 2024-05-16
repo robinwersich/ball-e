@@ -9,18 +9,22 @@ int main() {
   stdio_init_all();
   sleep_ms(2000);
 
-  const auto imu = std::make_shared<LSM6>(7, LSM6::AccelConfig{}, LSM6::GyroConfig{});
+  LSM6::AccelConfig accel_config{.odr = lsm6::odr::HZ_208, .fs = lsm6::fs::acc::G_2};
+  LSM6::GyroConfig gyro_config{.odr = lsm6::odr::HZ_208, .fs = lsm6::fs::gyro::DPS_1000};
+  const auto imu = std::make_shared<LSM6>(7, accel_config, gyro_config);
   if (not imu->is_connected()) {
     printf("IMU not connected\n");
     return 1;
   }
 
-  OrientationEstimator orientation_estimator{imu};
+  OrientationEstimator orientation_estimator{
+    imu, Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
+  };
 
   while (true) {
     if (orientation_estimator.update()) {
-      const auto orientation = orientation_estimator.orientation();
-      show_vector("orientation", orientation.x(), orientation.y(), orientation.z());
+      const auto up = orientation_estimator.up();
+      show_vector("up", up.x(), up.y(), up.z());
     }
   }
 }

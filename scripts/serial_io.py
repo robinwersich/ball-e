@@ -15,7 +15,7 @@ class Plotter:
         self.serial = serial
         self.timestamps = defaultdict(lambda: deque(maxlen=max_data_points))
         self.values = defaultdict(lambda: deque(maxlen=max_data_points))
-        self.animation = FuncAnimation(plt.gcf(), self.update, interval=50, save_count=100)
+        self.animation = FuncAnimation(plt.gcf(), self.update, interval=50, cache_frame_data=False)
 
     def update(self, i):
         while self.serial.in_waiting > 0:
@@ -53,7 +53,7 @@ class VectorViewer:
         self.ax.quiver(0, 0, 0, 1, 0, 0, color='r', label='x', arrow_length_ratio=0.1)
         self.ax.quiver(0, 0, 0, 0, 1, 0, color='g', label='y', arrow_length_ratio=0.1)
         self.ax.quiver(0, 0, 0, 0, 0, 1, color='b', label='z', arrow_length_ratio=0.1)
-        self.animation = FuncAnimation(self.fig, self.update, interval=50, save_count=100)
+        self.animation = FuncAnimation(self.fig, self.update, interval=20, cache_frame_data=False)
 
     def update(self, i):
         while self.serial.in_waiting > 0:

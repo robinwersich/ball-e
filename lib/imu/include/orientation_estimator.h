@@ -10,10 +10,10 @@ class OrientationEstimator {
   /**
    * Creates a new orientation estimator.
    * @param imu The IMU to read sensor data from.
-   * @param imu_orientation The matrix to convert from IMU to device coordinates
+   * @param imu_rotation The matrix to convert from IMU to device coordinates
    */
   OrientationEstimator(
-    std::shared_ptr<LSM6> imu, Eigen::Matrix3f imu_orientation = Eigen::Matrix3f::Identity()
+    std::shared_ptr<LSM6> imu, Eigen::Matrix3f imu_rotation = Eigen::Matrix3f::Identity()
   );
   /**
    * Updates the orientation estimate based on the latest sensor data.
@@ -23,12 +23,13 @@ class OrientationEstimator {
 
   /** Returns the current orientation as the global up vector in device-local coordinates. */
   const Eigen::Vector3f& up() const { return _up; }
-  /** Returns the current orientation as the device normal vector in global coordinates. */
-  Eigen::Vector3f orientation() const { return {-_up.x(), -_up.y(), _up.z()}; }
 
  private:
   std::shared_ptr<LSM6> _imu;
-  Eigen::Matrix3f _imu_orientation;
+  Eigen::Matrix3f _imu_rotation;
   Eigen::Vector3f _up;
   uint32_t _last_update = 0;
+
+  /** Returns the up vector based on the accelerometer. */
+  Eigen::Vector3f get_accel_up() const;
 };
