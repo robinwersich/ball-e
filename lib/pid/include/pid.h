@@ -38,8 +38,10 @@ class PidController {
 
   ~PidController();
 
-  PidController(const PidController&) = delete;
-  PidController& operator=(const PidController&) = delete;
+#ifndef NDEBUG
+  PidController(PidController&& other);
+  PidController& operator=(PidController&& other);
+#endif
 
   void set_gains(PidGains gains);
   void set_proportional_gain(float kp);
@@ -67,5 +69,8 @@ class PidController {
 
   void register_parameters();
   void unregister_parameters();
+
+  PidController& operator=(const PidController& other) = default;
+  PidController(const PidController& other) = default;
 #endif
 };

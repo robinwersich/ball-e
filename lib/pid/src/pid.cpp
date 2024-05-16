@@ -29,6 +29,22 @@ PidController::~PidController() {
 #endif
 }
 
+#ifndef NDEBUG
+PidController::PidController(PidController&& other) : PidController(other) {
+  other.unregister_parameters();
+  other._name.clear();
+  register_parameters();
+}
+
+PidController& PidController::operator=(PidController&& other) {
+  *this = other;
+  other.unregister_parameters();
+  other._name.clear();
+  register_parameters();
+  return *this;
+}
+#endif
+
 void PidController::set_gains(PidGains gains) {
   set_proportional_gain(gains.kp);
   set_integral_gain(gains.ki);
@@ -93,6 +109,7 @@ void PidController::register_parameters() {
 }
 
 void PidController::unregister_parameters() {
+  if (_name.empty()) return;
   parameters::unregister_parameter("kp_" + _name);
   parameters::unregister_parameter("ki_" + _name);
   parameters::unregister_parameter("kd_" + _name);
