@@ -46,8 +46,9 @@ void run_bluetooth_loop() {
 int main() {
   stdio_init_all();
 
-  LSM6::AccelConfig accel_config{.odr = lsm6::odr::HZ_104, .fs = lsm6::fs::acc::G_2};
-  LSM6::GyroConfig gyro_config{.odr = lsm6::odr::HZ_104, .fs = lsm6::fs::gyro::DPS_1000};
+  using namespace lsm6;
+  LSM6::AccelConfig accel_config{.odr = odr::HZ_104, .fs = fs::acc::G_2, .low_pass = true};
+  LSM6::GyroConfig gyro_config{.odr = odr::HZ_104, .fs = fs::gyro::DPS_1000};
   const auto imu = std::make_shared<LSM6>(7, accel_config, gyro_config);
 
   robot = std::make_unique<Robot>(
