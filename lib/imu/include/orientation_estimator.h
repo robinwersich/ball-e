@@ -12,9 +12,7 @@ class OrientationEstimator {
    * @param imu The IMU to read sensor data from.
    * @param imu_rotation The matrix to convert from IMU to device coordinates
    */
-  OrientationEstimator(
-    std::shared_ptr<LSM6> imu, Eigen::Matrix3f imu_rotation = Eigen::Matrix3f::Identity()
-  );
+  OrientationEstimator(std::shared_ptr<LSM6> imu);
   /**
    * Updates the orientation estimate based on the latest sensor data.
    * @returns True if the orientation was updated, false if no new data was available.
@@ -26,7 +24,6 @@ class OrientationEstimator {
 
  private:
   std::shared_ptr<LSM6> _imu;
-  Eigen::Matrix3f _imu_rotation;
   Eigen::Vector3f _up;
   uint32_t _last_update = 0;
 

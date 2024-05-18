@@ -71,3 +71,10 @@ The following describes the setup using [Visual Studio Code](https://code.visual
    If you run CMake manually, make sure to pass the `-DPICO_BOARD=pico_w` flag.
 1. Navigate to the `build` folder and execute `make` to build all project files. Use `-j4` to use 4 threads for a faster build.
 1. Connect the Pico while pressing the bootsel button, which should mount is as mass storage device. Then copy the `*.uf2` file to this drive.
+
+### IMU Calibration
+The IMU needs to be calibrated for good results:
+1. Flash the `playground/imu_calibration` software on the pico.
+1. Use the `scripts/imu_calibration.py` script to retrieve the gyro bias and acceleration measurements.
+1. Use [Magneto](https://sailboatinstruments.blogspot.com/2011/09/improved-magnetometer-calibration-part.html) or a similar tool to get the bias and correction matrix.
+1. Adjust the values in `imu_calibration_values.h` correspondingly.

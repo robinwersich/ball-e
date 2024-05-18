@@ -3,6 +3,7 @@
 #include <Eigen/Core>
 
 #include "hardware/i2c.h"
+#include "imu_calibration.h"
 #include "pico/types.h"
 
 namespace lsm6 {
@@ -74,12 +75,19 @@ class LSM6 {
 
   /**
    * Sets up the IC2 connection to the LSM6DSO sensor and initializes it with the given config.
+   * As a result, only one instance of this class should be created per physical sensor.
+   * It is recommended to use a shared_ptr.
    * @param slot The I2C pin pair to use for communication. SDA=2*slot and SCL=2*slot+1.
    * @param config The configuration for the accelerometer.
    * @param gyro_config The configuration for the gyroscope.
    * @param sa0 The state of the SA0 pin. If true, the address is 0b1101011, otherwise 0b1101010.
+   * @param calibration The calibration values for the sensor (in units of g and dps).
    */
-  LSM6(uint8_t slot, const AccelConfig& config, const GyroConfig& gyro_config, bool sa0 = true);
+  LSM6(
+    uint8_t slot, const AccelConfig& config, const GyroConfig& gyro_config, bool sa0 = true,
+    const ImuCalibration& calibration = {},
+    const Eigen::Matrix3f& orientation = Eigen::Matrix3f::Identity()
+  );
   /**
    * Turns off the LSM6DSO sensor and stops the I2C connection to the LSM6DSO sensor.
    */
@@ -111,8 +119,7 @@ class LSM6 {
  private:
   i2c_inst_t* _i2c_port;
   uint8_t _address;
-  float _accel_scale;
-  float _gyro_scale;
+  ImuCalibration _calibration;  // includes scaling and orientation
 
   void read(uint8_t reg, uint8_t* data, size_t len) const;
   void write(uint8_t reg, const uint8_t* data, size_t len) const;

@@ -1,4 +1,5 @@
 #include "btcontrol.h"
+#include "imu_calibration_values.h"
 #include "motor_drivers/dri0044.h"
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
@@ -49,7 +50,10 @@ int main() {
   using namespace lsm6;
   LSM6::AccelConfig accel_config{.odr = odr::HZ_104, .fs = fs::acc::G_2, .low_pass = true};
   LSM6::GyroConfig gyro_config{.odr = odr::HZ_104, .fs = fs::gyro::DPS_1000};
-  const auto imu = std::make_shared<LSM6>(7, accel_config, gyro_config);
+  const auto imu = std::make_shared<LSM6>(
+    7, accel_config, gyro_config, true, IMU_CALIBRATION,
+    Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
+  );
 
   robot = std::make_unique<Robot>(
     std::array<Omniwheel, 3>{
@@ -57,8 +61,7 @@ int main() {
       Omniwheel(150, std::make_unique<MotorDriverDRI0044>(PWM2, DIR2, PWM_FREQUENCY)),
       Omniwheel(270, std::make_unique<MotorDriverDRI0044>(PWM3, DIR3, PWM_FREQUENCY)),
     },
-    OrientationEstimator{imu, Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}},
-    PidGains{0.0, 0.0, 0.0}  // TODO: tune gains
+    OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0}  // TODO: tune gains
   );
 
   multicore_launch_core1(run_bluetooth_loop);

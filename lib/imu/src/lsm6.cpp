@@ -21,11 +21,22 @@ enum Register : uint8_t {
 
 }
 
-LSM6::LSM6(uint8_t slot, const AccelConfig& accel_config, const GyroConfig& gyro_config, bool sa0)
+LSM6::LSM6(
+  uint8_t slot, const AccelConfig& accel_config, const GyroConfig& gyro_config, bool sa0,
+  const ImuCalibration& calibration, const Eigen::Matrix3f& orientation
+)
   : _i2c_port{slot % 2 == 0 ? i2c0 : i2c1}
   , _address{static_cast<uint8_t>(I2C_ADDRESS | sa0)}
-  , _accel_scale{accel_config.fs.range / std::numeric_limits<int16_t>::max()}
-  , _gyro_scale{gyro_config.fs.range / std::numeric_limits<int16_t>::max()} {
+  , _calibration{calibration} {
+  // add scaling and orientation to the calibration
+  const auto accel_scale = accel_config.fs.range / std::numeric_limits<int16_t>::max();
+  const auto gyro_scale = gyro_config.fs.range / std::numeric_limits<int16_t>::max();
+  // bias is applied before scaling
+  _calibration.accel_bias /= accel_scale;
+  _calibration.gyro_bias /= gyro_scale;
+  _calibration.accel_transform = orientation * accel_scale * _calibration.accel_transform;
+  _calibration.gyro_transform = orientation * gyro_scale * _calibration.gyro_transform;
+
   const auto pin_sda = 2 * slot;
   const auto pin_scl = 2 * slot + 1;
 
@@ -76,11 +87,15 @@ Eigen::Vector3<int16_t> LSM6::read_acceleration_raw() const {
 }
 
 Eigen::Vector3f LSM6::read_acceleration() const {
-  return read_acceleration_raw().cast<float>() * _accel_scale;
+  const auto& bias = _calibration.accel_bias;
+  const auto& transform = _calibration.accel_transform;
+  return transform * (read_acceleration_raw().cast<float>() - bias);
 }
 
 Eigen::Vector3f LSM6::read_rotation() const {
-  return read_rotation_raw().cast<float>() * _gyro_scale;
+  const auto& bias = _calibration.gyro_bias;
+  const auto& transform = _calibration.gyro_transform;
+  return transform * (read_rotation_raw().cast<float>() - bias);
 }
 
 Eigen::Vector3<int16_t> LSM6::read_rotation_raw() const {

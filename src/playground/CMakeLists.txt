@@ -173,3 +173,23 @@ pico_enable_stdio_usb(orientation_test 1)
 pico_enable_stdio_uart(orientation_test 0)
 
 pico_add_extra_outputs(orientation_test)
+
+
+# --- IMU calibration ---
+add_executable(imu_calibration
+    imu_calibration.cpp
+)
+
+target_include_directories(imu_calibration PRIVATE
+    ..
+)
+
+target_link_libraries(imu_calibration
+    pico_stdlib
+    imu
+)
+
+pico_enable_stdio_usb(imu_calibration 1)
+pico_enable_stdio_uart(imu_calibration 0)
+
+pico_add_extra_outputs(imu_calibration)

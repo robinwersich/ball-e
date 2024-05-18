@@ -8,13 +8,11 @@
 const float GYRO_WEIGHT = 0.99;
 const float ACCEL_WEIGHT = 1 - GYRO_WEIGHT;
 
-OrientationEstimator::OrientationEstimator(
-  std::shared_ptr<LSM6> imu, Eigen::Matrix3f imu_rotation
-)
-  : _imu{std::move(imu)}, _imu_rotation{std::move(imu_rotation)}, _up{get_accel_up()} {}
+OrientationEstimator::OrientationEstimator(std::shared_ptr<LSM6> imu)
+  : _imu{std::move(imu)}, _up{get_accel_up()} {}
 
 Eigen::Vector3f OrientationEstimator::get_accel_up() const {
-  return (_imu_rotation * _imu->read_acceleration()).normalized();
+  return _imu->read_acceleration().normalized();
 }
 
 bool OrientationEstimator::update() {
@@ -29,7 +27,7 @@ bool OrientationEstimator::update() {
   const auto now = time_us_32();
   const auto dt = (now - _last_update) / 1e6f;
   _last_update = now;
-  const auto rotation = _imu_rotation * _imu->read_rotation();
+  const auto rotation = _imu->read_rotation();
   const auto velocity_dps = rotation.norm();
   const auto rotation_axis = rotation / velocity_dps;
   const auto rotation_angle = static_cast<float>(velocity_dps * dt * M_PI / 180);
