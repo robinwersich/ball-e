@@ -14,14 +14,11 @@ PidController::PidController(float out_min, float out_max, PidGains gains, const
   , _kp{gains.kp}
   , _ki{gains.ki / 10e6f}  // convert from C/(M*s) to C/(M*us)
   , _kd{gains.kd * 10e6f}  // convert from C/(M/s) to C/(M/us)
-#ifndef NDEBUG
   , _name{name} {
+#ifndef NDEBUG
   register_parameters();
-}
-#else
-{
-}
 #endif
+}
 
 PidController::~PidController() {
 #ifndef NDEBUG
@@ -45,6 +42,13 @@ PidController& PidController::operator=(PidController&& other) {
 }
 #endif
 
+void PidController::reset() {
+  _i_term = 0;
+  _last_error = std::numeric_limits<float>::quiet_NaN();
+  _last_measurement = std::numeric_limits<float>::quiet_NaN();
+  _last_time_millis = 0;
+}
+
 void PidController::set_gains(PidGains gains) {
   set_proportional_gain(gains.kp);
   set_integral_gain(gains.ki);
@@ -62,7 +66,18 @@ float PidController::compute(float measurement, float target) {
   return compute(measurement);
 }
 
+bool PidController::is_initialized() const {
+  return not (std::isnan(_last_error) || std::isnan(_last_measurement) || _last_time_millis == 0);
+}
+
 float PidController::compute(float measurement) {
+  if (not is_initialized()) {
+    _last_error = _target - measurement;
+    _last_measurement = measurement;
+    _last_time_millis = time_us_32();
+    return 0;
+  }
+
   const auto error = _target - measurement;
   const auto now = time_us_32();
   const auto dt = (now - _last_time_millis);
@@ -82,12 +97,14 @@ float PidController::compute(float measurement) {
 
   const auto output = std::clamp(p_term + i_term + d_term, _out_min, _out_max);
 #ifndef NDEBUG
-  plot("p", p_term);
-  plot("i", i_term);
-  plot("d", d_term);
-  plot("target", _target);
-  plot("measurement", measurement);
-  plot("output", output);
+  if (not _name.empty()) {
+    plot((_name + " p").c_str(), p_term);
+    plot((_name + " i").c_str(), i_term);
+    plot((_name + " d").c_str(), d_term);
+    plot((_name + " target").c_str(), _target);
+    plot((_name + " measurement").c_str(), measurement);
+    plot((_name + " output").c_str(), output);
+  }
 #endif
 
   return output;

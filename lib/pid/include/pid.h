@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <optional>
 #ifndef NDEBUG
 #include <map>
@@ -55,15 +56,24 @@ class PidController {
   /** Computes the control signal based on the given measurement and the previously set target. */
   float compute(float measurement);
 
+  /**
+   * Resets the controllers internal state (but not the target).
+   * Should be called when compute was not called for a longer time.
+   */
+  void reset();
+
  private:
   uint32_t _sample_time_millis;
   float _kp, _ki, _kd;  // gains in C/M, C/(M*us), C/(M/us) to avoid unnecessary computations
   float _out_min, _out_max;
   float _i_term = 0.0;  // error sum multiplied by ki
-  float _last_error = 0.0;
+  float _last_error = NAN;
   float _target = 0.0;
-  float _last_measurement = 0.0;
-  uint32_t _last_time_millis = 0;
+  float _last_measurement = NAN;
+  uint32_t _last_time_millis = 0;  // 0 means uninitialized
+
+  bool is_initialized() const;
+
 #ifndef NDEBUG
   std::string _name;
 
