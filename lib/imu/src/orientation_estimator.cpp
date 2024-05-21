@@ -3,6 +3,9 @@
 #include <Eigen/Geometry>
 #include <cmath>
 
+#ifndef NDEBUG
+#include "plot.h"
+#endif
 #include "pico/time.h"
 
 const float GYRO_WEIGHT = 0.99;
@@ -37,6 +40,14 @@ bool OrientationEstimator::update(bool force) {
   // Use complementary filter to combine the two orientations.
   // Using mainly gyroscope but adding a bit of the accelerometer avoids drift and noise.
   _up = (gyro_up * GYRO_WEIGHT + accel_up * ACCEL_WEIGHT).normalized();
+
+#ifndef NDEBUG
+  if (show_debug) {
+    show_vector("gyro_up", gyro_up.x(), gyro_up.y(), gyro_up.z());
+    show_vector("accel_up", accel_up.x(), accel_up.y(), accel_up.z());
+    show_vector("up", _up.x(), _up.y(), _up.z());
+  }
+#endif
 
   return true;
 }

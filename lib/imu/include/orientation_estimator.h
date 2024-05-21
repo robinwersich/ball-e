@@ -26,6 +26,10 @@ class OrientationEstimator {
   /** Returns the expected time to wait between new sensor data */
   const uint64_t update_period_us() const { return _imu->period_us(); }
 
+#ifndef NDEBUG
+  bool show_debug = false;
+#endif
+
  private:
   std::shared_ptr<LSM6> _imu;
   Eigen::Vector3f _up;
