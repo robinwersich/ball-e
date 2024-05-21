@@ -55,6 +55,11 @@ class VectorViewer:
         self.ax.quiver(0, 0, 0, 0, 0, 1, color='b', label='z', arrow_length_ratio=0.1)
         self.animation = FuncAnimation(self.fig, self.update, interval=20, cache_frame_data=False)
 
+    @staticmethod
+    def color_from_id(data_id: str) -> str:
+        return '#' + hex(hash(data_id))[-6:]
+
+
     def update(self, i):
         while self.serial.in_waiting > 0:
             line = self.serial.readline().decode().strip()
@@ -64,7 +69,10 @@ class VectorViewer:
             data_id, x, y, z = line.removeprefix('$v ').split(',')
             if data_id in self.quivers:
                 self.quivers[data_id].remove()
-            self.quivers[data_id] = self.ax.quiver(0, 0, 0, float(x), float(y), float(z), label=data_id)
+            self.quivers[data_id] = self.ax.quiver(
+                0, 0, 0, float(x), float(y), float(z), label=data_id, color=self.color_from_id(data_id)
+            )
+        self.ax.legend(loc="upper left")
 
     def show(self):
         plt.show()
