@@ -10,7 +10,9 @@ target_include_directories(motor_hardware PUBLIC
   ./include
 )
 
-target_link_libraries(motor_hardware PUBLIC
-  pico_stdlib
-  hardware_pwm
+target_link_libraries(motor_hardware
+  PUBLIC
+    pico_stdlib
+  PRIVATE
+    hardware_pwm
 )

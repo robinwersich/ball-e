@@ -18,12 +18,14 @@ target_include_directories(btcontrol PUBLIC
     ${BTCONTROL_INCLUDE_DIRS}
 )
 
-target_link_libraries(btcontrol PUBLIC
+target_link_libraries(btcontrol
+  PUBLIC
     pico_stdlib
+    bluepad32
+  PRIVATE
     pico_cyw43_arch_none
     pico_btstack_classic
     pico_btstack_cyw43
-    bluepad32
 )
 
 include_directories(${BTCONTROL_INCLUDE_DIRS})

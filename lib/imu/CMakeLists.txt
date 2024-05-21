@@ -7,8 +7,11 @@ target_include_directories(imu PUBLIC
   ./include
 )
 
-target_link_libraries(imu PUBLIC
-  pico_stdlib
-  hardware_i2c
-  Eigen3::Eigen
+target_link_libraries(imu
+  PUBLIC
+    pico_stdlib
+    Eigen3::Eigen
+    hardware_i2c
+  PRIVATE
+    debug debugging
 )
