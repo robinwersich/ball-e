@@ -36,6 +36,17 @@ class Omniwheel {
    */
   void drive(float speed) const;
 
+  /**
+   * Make the omniwheel drive in the direction and with the speed given by the movement vector,
+   * and additionally by some speed along the main axis.
+   * The sum of the length of the movement vector and the absolute value of the forward speed
+   * should be between 0 and 1.
+   * @param x The rightward component of the movement vector.
+   * @param y The forward component of the movement vector.
+   * @param forward The speed along the main axis.
+   */
+  void drive(float x, float y, float forward) const;
+
   /** Stops the omniwheel. */
   void stop() const;
 

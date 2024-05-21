@@ -1,8 +1,8 @@
 #include "btcontrol.h"
 #include "imu_calibration_values.h"
 #include "motor_drivers/dri0044.h"
-#include "pico/stdlib.h"
 #include "pico/critical_section.h"
+#include "pico/stdlib.h"
 #include "robot.h"
 
 const uint PWM_FREQUENCY = 25000;
@@ -23,14 +23,7 @@ const uint IMU_SLOT = 7;
 
 std::unique_ptr<Robot> robot;
 
-critical_section_t create_critical_section() {
-  critical_section_t cs;
-  critical_section_init(&cs);
-  return cs;
-}
-
 void on_gamepad_data(const uni_gamepad_t& gamepad) {
-  static critical_section_t cs = create_critical_section();
   static bool balance_pressed = false;
 
   if (gamepad.buttons & BUTTON_B and !balance_pressed) {
@@ -43,11 +36,7 @@ void on_gamepad_data(const uni_gamepad_t& gamepad) {
   const float speed_y = gamepad.axis_y / 512.0;
   const float speed_rot = (gamepad.throttle - gamepad.brake) / 1024.0;
 
-  // avoid robot update while speed is set
-  critical_section_enter_blocking(&cs);
-  robot->drive(speed_x, speed_y);
-  robot->rotate(-speed_rot);  // robot should spin clockwise when throttle is pressed
-  critical_section_exit(&cs);
+  robot->set_speed(speed_x, speed_y, -speed_rot); //  should spin clockwise when throttle is pressed
 }
 
 int main() {

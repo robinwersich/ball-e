@@ -2,8 +2,9 @@
 
 #include "omniwheel.h"
 #include "orientation_estimator.h"
-#include "pid.h"
 #include "pico/time.h"
+#include "pico/critical_section.h"
+#include "pid.h"
 
 class Robot {
  public:
@@ -11,6 +12,7 @@ class Robot {
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator,
     PidGains balance_gains
   );
+  ~Robot();
 
   /**
    * Make the robot drive in the direction and with the speed given by the movement vector.
@@ -18,13 +20,21 @@ class Robot {
    * @param x The rightward component of the movement vector.
    * @param y The forward component of the movement vector.
    */
-  void drive(float x, float y);
+  void set_drive_speed(float x, float y);
 
   /**
    * Make the robot rotate around its center.
    * @param speed The speed at which to rotate, between -1 (clockwise) and 1 (anti-clockwise).
    */
-  void rotate(float speed);
+  void set_rotate_speed(float speed);
+
+  /**
+   * Sets linear drive and rotational speed at once.
+   * @param x The rightward component of the movement vector.
+   * @param y The forward component of the movement vector.
+   * @param speed The speed at which to rotate, between -1 (clockwise) and 1 (anti-clockwise).
+   */
+  void set_speed(float x, float y, float rot);
 
   /** Stops the robot. */
   void stop();
@@ -49,8 +59,11 @@ class Robot {
   float _speed_rot = 0;
   bool _balancing_mode = false;
   repeating_timer_t _update_timer;
+  critical_section_t _cs;
 
   void update();
   void update_ground();
   void update_balancing();
+
+  void drive(float x, float y, float rot);
 };
