@@ -1,8 +1,8 @@
 #include "btcontrol.h"
 #include "imu_calibration_values.h"
 #include "motor_drivers/dri0044.h"
-#include "pico/multicore.h"
 #include "pico/stdlib.h"
+#include "pico/critical_section.h"
 #include "robot.h"
 
 const uint PWM_FREQUENCY = 25000;
@@ -23,8 +23,16 @@ const uint IMU_SLOT = 7;
 
 std::unique_ptr<Robot> robot;
 
+critical_section_t create_critical_section() {
+  critical_section_t cs;
+  critical_section_init(&cs);
+  return cs;
+}
+
 void on_gamepad_data(const uni_gamepad_t& gamepad) {
+  static critical_section_t cs = create_critical_section();
   static bool balance_pressed = false;
+
   if (gamepad.buttons & BUTTON_B and !balance_pressed) {
     robot->toggle_balancing();
     printf("Balancing mode %s\n", robot->is_balancing() ? "enabled" : "disabled");
@@ -34,18 +42,22 @@ void on_gamepad_data(const uni_gamepad_t& gamepad) {
   const float speed_x = gamepad.axis_x / 512.0;
   const float speed_y = gamepad.axis_y / 512.0;
   const float speed_rot = (gamepad.throttle - gamepad.brake) / 1024.0;
+
+  // avoid robot update while speed is set
+  critical_section_enter_blocking(&cs);
   robot->drive(speed_x, speed_y);
   robot->rotate(-speed_rot);  // robot should spin clockwise when throttle is pressed
-}
-
-void run_bluetooth_loop() {
-  btcontrol::init();
-  btcontrol::register_gampad_behavior(on_gamepad_data);
-  btcontrol::run_loop();
+  critical_section_exit(&cs);
 }
 
 int main() {
   stdio_init_all();
+
+  // configure hardware timers to have lower priority than the default
+  irq_set_priority(TIMER_IRQ_0, PICO_DEFAULT_IRQ_PRIORITY + 1);
+  irq_set_priority(TIMER_IRQ_1, PICO_DEFAULT_IRQ_PRIORITY + 1);
+  irq_set_priority(TIMER_IRQ_2, PICO_DEFAULT_IRQ_PRIORITY + 1);
+  irq_set_priority(TIMER_IRQ_3, PICO_DEFAULT_IRQ_PRIORITY + 1);
 
   using namespace lsm6;
   LSM6::AccelConfig accel_config{.odr = odr::HZ_104, .fs = fs::acc::G_2, .low_pass = true};
@@ -64,8 +76,11 @@ int main() {
     OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0}  // TODO: tune gains
   );
 
-  multicore_launch_core1(run_bluetooth_loop);
-  robot->run_control_loop();
+  robot->start_updating();
+
+  btcontrol::init();
+  btcontrol::register_gampad_behavior(on_gamepad_data);
+  btcontrol::run_loop();
 
   return 0;
 }

@@ -7,7 +7,8 @@ Robot::Robot(
   : _wheels{std::move(wheels)}
   , _orientation_estimator{std::move(orientation_estimator)}
   , _pid_x{-1, 1, balance_gains}
-  , _pid_y{-1, 1, balance_gains} {}
+  , _pid_y{-1, 1, balance_gains} {
+}
 
 void Robot::drive(float x, float y) {
   _speed_x = x;
@@ -22,14 +23,25 @@ void Robot::stop() {
   _speed_rot = 0;
 }
 
-void Robot::run_control_loop() {
-  while (true) {
-    if (!_orientation_estimator.update()) continue;
-    if (_balancing_mode) {
-      update_balancing();
-    } else {
-      update_ground();
-    }
+void Robot::start_updating() {
+  add_repeating_timer_us(
+    _orientation_estimator.update_period_us(),
+    [](repeating_timer_t* rt) {
+      reinterpret_cast<Robot*>(rt->user_data)->update();
+      return true;
+    },
+    this, &_update_timer
+  );
+}
+
+void Robot::stop_updating() { cancel_repeating_timer(&_update_timer); }
+
+void Robot::update() {
+  _orientation_estimator.update(true);
+  if (_balancing_mode) {
+    update_balancing();
+  } else {
+    update_ground();
   }
 }
 

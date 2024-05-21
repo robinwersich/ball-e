@@ -3,6 +3,7 @@
 #include "omniwheel.h"
 #include "orientation_estimator.h"
 #include "pid.h"
+#include "pico/time.h"
 
 class Robot {
  public:
@@ -35,8 +36,10 @@ class Robot {
   /** Returns true if the robot is currently balancing. */
   bool is_balancing() const;
 
-  /** Runs the robot control loop. This will not return. */
-  void run_control_loop();
+  /** Sets up a timer interrupt for handling the robot movement. */
+  void start_updating();
+  /** Stops the timer interrupt for handling the robot movement. */
+  void stop_updating();
 
  private:
   std::array<Omniwheel, 3> _wheels;
@@ -45,7 +48,9 @@ class Robot {
   float _speed_x = 0, _speed_y = 0;
   float _speed_rot = 0;
   bool _balancing_mode = false;
+  repeating_timer_t _update_timer;
 
+  void update();
   void update_ground();
   void update_balancing();
 };

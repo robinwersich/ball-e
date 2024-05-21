@@ -116,10 +116,14 @@ class LSM6 {
    */
   Eigen::Vector3f read_rotation() const;
 
+  /** Returns the duration between two measurements. */
+  uint64_t period_us() const { return _period_us; }
+
  private:
   i2c_inst_t* _i2c_port;
   uint8_t _address;
   ImuCalibration _calibration;  // includes scaling and orientation
+  uint64_t _period_us;
 
   void read(uint8_t reg, uint8_t* data, size_t len) const;
   void write(uint8_t reg, const uint8_t* data, size_t len) const;

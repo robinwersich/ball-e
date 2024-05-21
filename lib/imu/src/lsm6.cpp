@@ -27,7 +27,10 @@ LSM6::LSM6(
 )
   : _i2c_port{slot % 2 == 0 ? i2c0 : i2c1}
   , _address{static_cast<uint8_t>(I2C_ADDRESS | sa0)}
-  , _calibration{calibration} {
+  , _calibration{calibration}
+  , _period_us{static_cast<uint64_t>(
+      std::round(1e6f / std::max(accel_config.odr.frequency, gyro_config.odr.frequency))
+    )} {
   // add scaling and orientation to the calibration
   const auto accel_scale = accel_config.fs.range / std::numeric_limits<int16_t>::max();
   const auto gyro_scale = gyro_config.fs.range / std::numeric_limits<int16_t>::max();

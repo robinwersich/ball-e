@@ -15,8 +15,8 @@ Eigen::Vector3f OrientationEstimator::get_accel_up() const {
   return _imu->read_acceleration().normalized();
 }
 
-bool OrientationEstimator::update() {
-  if (not _imu->is_new_data_available()) return false;
+bool OrientationEstimator::update(bool force) {
+  if (not force and not _imu->is_new_data_available()) return false;
 
   // Calculate the up vector based on the accelerometer.
   // This value doesn't drift, but is noisy when imu is moved.

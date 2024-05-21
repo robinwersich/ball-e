@@ -15,12 +15,16 @@ class OrientationEstimator {
   OrientationEstimator(std::shared_ptr<LSM6> imu);
   /**
    * Updates the orientation estimate based on the latest sensor data.
+   * @param force If true, availability of new data will not be checked.
    * @returns True if the orientation was updated, false if no new data was available.
    */
-  bool update();
+  bool update(bool force = false);
 
   /** Returns the current orientation as the global up vector in device-local coordinates. */
   const Eigen::Vector3f& up() const { return _up; }
+
+  /** Returns the expected time to wait between new sensor data */
+  const uint64_t update_period_us() const { return _imu->period_us(); }
 
  private:
   std::shared_ptr<LSM6> _imu;
