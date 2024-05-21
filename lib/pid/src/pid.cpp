@@ -14,7 +14,10 @@ PidController::PidController(float out_min, float out_max, PidGains gains, const
   , _kp{gains.kp}
   , _ki{gains.ki / 10e6f}  // convert from C/(M*s) to C/(M*us)
   , _kd{gains.kd * 10e6f}  // convert from C/(M/s) to C/(M/us)
-  , _name{name} {
+#ifndef NDEBUG
+  , _name{name}
+#endif
+{
 #ifndef NDEBUG
   register_parameters();
 #endif
@@ -98,12 +101,12 @@ float PidController::compute(float measurement) {
   const auto output = std::clamp(p_term + i_term + d_term, _out_min, _out_max);
 #ifndef NDEBUG
   if (not _name.empty()) {
-    plot((_name + " p").c_str(), p_term);
-    plot((_name + " i").c_str(), i_term);
-    plot((_name + " d").c_str(), d_term);
-    plot((_name + " target").c_str(), _target);
-    plot((_name + " measurement").c_str(), measurement);
-    plot((_name + " output").c_str(), output);
+    plot((_name + "_p").c_str(), p_term);
+    plot((_name + "_i").c_str(), i_term);
+    plot((_name + "_d").c_str(), d_term);
+    plot((_name + "_target").c_str(), _target);
+    plot((_name + "_measurement").c_str(), measurement);
+    plot((_name + "_output").c_str(), output);
   }
 #endif
 
