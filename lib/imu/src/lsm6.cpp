@@ -14,6 +14,9 @@ enum Register : uint8_t {
   WHO_AM_I = 0x0F,
   CTRL1_XL = 0x10,
   CTRL2_G = 0x11,
+  CTRL4_C = 0x13,
+  CTRL6_C = 0x15,
+  CTRL8_XL = 0x17,
   STATUS_REG = 0x1E,
   GYRO_OUT = 0x22,
   ACCEL_OUT = 0x28,
@@ -47,15 +50,21 @@ LSM6::LSM6(
   gpio_set_function(pin_sda, GPIO_FUNC_I2C);
   gpio_set_function(pin_scl, GPIO_FUNC_I2C);
 
-  const uint8_t CTRL1_XL_val = static_cast<uint8_t>(accel_config.odr.code) << 4
-                             | static_cast<uint8_t>(accel_config.fs.code) << 2
-                             | (accel_config.low_pass ? 1 : 0) << 1;
-  const uint8_t CTRL2_G_val = static_cast<uint8_t>(gyro_config.odr.code) << 4
-                            | static_cast<uint8_t>(gyro_config.fs.code) << 1;
+  const uint8_t CTRL1_XL_val = static_cast<uint8_t>(accel_config.odr.code << 4)
+                             | static_cast<uint8_t>(accel_config.fs.code << 2)
+                             | static_cast<uint8_t>((accel_config.lp_cutoff & 0b1000) >> 2);
+  const uint8_t CTRL2_G_val = static_cast<uint8_t>(gyro_config.odr.code << 4)
+                            | static_cast<uint8_t>(gyro_config.fs.code << 1);
+  const uint8_t CTRL4_C_val = static_cast<uint8_t>((gyro_config.lp_intensity & 0b1000) >> 2);
+  const uint8_t CTRL6_C_val = static_cast<uint8_t>(gyro_config.lp_intensity & 0b0111);
+  const uint8_t CTRL8_XL_val = static_cast<uint8_t>((accel_config.lp_cutoff & 0b0111) << 5);
 
   sleep_ms(100);
   write(CTRL1_XL, &CTRL1_XL_val, 1);
   write(CTRL2_G, &CTRL2_G_val, 1);
+  write(CTRL4_C, &CTRL4_C_val, 1);
+  write(CTRL6_C, &CTRL6_C_val, 1);
+  write(CTRL8_XL, &CTRL8_XL_val, 1);
   sleep_ms(100);
 }
 

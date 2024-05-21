@@ -8,22 +8,20 @@
 
 namespace lsm6 {
 
-/** Output data rate. */
 struct ODR {
   float frequency;
   uint8_t code;
 };
-/** Full scale range for accelerometer. */
 struct AccFS {
   float range;
   uint8_t code;
 };
-/** Full scale range for gyroscope. */
 struct GyroFS {
   float range;
   uint8_t code;
 };
 
+/** Output data rate. */
 namespace odr {
 constexpr ODR POWER_DOWN = {0, 0b0000};
 constexpr ODR HZ_1_6 = {1, 0b1011};  // low power only
@@ -39,6 +37,7 @@ constexpr ODR KHZ_3_33 = {3333, 0b1001};
 constexpr ODR KHZ_6_66 = {6666, 0b1010};
 }
 
+/** Full scale range for accelerometer. */
 namespace fs::acc {
 constexpr AccFS G_2 = {2, 0b00};
 constexpr AccFS G_4 = {4, 0b10};
@@ -46,11 +45,38 @@ constexpr AccFS G_8 = {8, 0b11};
 constexpr AccFS G_16 = {16, 0b01};
 }
 
+/** Full scale range for gyroscope. */
 namespace fs::gyro {
 constexpr GyroFS DPS_125 = {125, 0b001};
 constexpr GyroFS DPS_250 = {250, 0b000};
 constexpr GyroFS DPS_500 = {500, 0b010};
 constexpr GyroFS DPS_1000 = {1000, 0b100};
+}
+
+/** Accelerometer LP filter cutoff frequency fraction (1/x) */
+namespace cutoff::accel {
+constexpr uint8_t CO_2 = 0b0000;
+constexpr uint8_t CO_4 = 0b1000;
+constexpr uint8_t CO_10 = 0b1001;
+constexpr uint8_t CO_20 = 0b1010;
+constexpr uint8_t CO_45 = 0b1011;
+constexpr uint8_t CO_100 = 0b1100;
+constexpr uint8_t CO_200 = 0b1101;
+constexpr uint8_t CO_400 = 0b1110;
+constexpr uint8_t CO_800 = 0b1111;
+}
+
+/** Gyroscope LP filter intensity (exact values can be found in manual) */
+namespace cutoff::gyro {
+constexpr uint8_t CO_OFF = 0b0000;
+constexpr uint8_t CO_0 = 0b1000;
+constexpr uint8_t CO_1 = 0b1001;
+constexpr uint8_t CO_2 = 0b1010;
+constexpr uint8_t CO_3 = 0b1011;
+constexpr uint8_t CO_4 = 0b1100;
+constexpr uint8_t CO_5 = 0b1101;
+constexpr uint8_t CO_6 = 0b1110;
+constexpr uint8_t CO_7 = 0b1111;
 }
 
 }
@@ -62,8 +88,8 @@ class LSM6 {
     lsm6::ODR odr = lsm6::odr::HZ_104;
     /** Range of the acceleration. */
     lsm6::AccFS fs = lsm6::fs::acc::G_2;
-    /** Enable low-pass filter for acceleration. */
-    bool low_pass = false;
+    /** Cutoff frequency for the lowpass filter. */
+    uint8_t lp_cutoff = lsm6::cutoff::accel::CO_2;
   };
 
   struct GyroConfig {
@@ -71,6 +97,8 @@ class LSM6 {
     lsm6::ODR odr = lsm6::odr::HZ_104;
     /** Range of the angular velocity. */
     lsm6::GyroFS fs = lsm6::fs::gyro::DPS_250;
+    /** LP filter intensity. */
+    uint8_t lp_intensity = lsm6::cutoff::gyro::CO_OFF;
   };
 
   /**

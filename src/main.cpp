@@ -49,7 +49,7 @@ int main() {
   irq_set_priority(TIMER_IRQ_3, PICO_DEFAULT_IRQ_PRIORITY + 1);
 
   using namespace lsm6;
-  LSM6::AccelConfig accel_config{.odr = odr::HZ_104, .fs = fs::acc::G_2, .low_pass = true};
+  LSM6::AccelConfig accel_config{.odr = odr::HZ_104, .fs = fs::acc::G_2};
   LSM6::GyroConfig gyro_config{.odr = odr::HZ_104, .fs = fs::gyro::DPS_1000};
   const auto imu = std::make_shared<LSM6>(
     7, accel_config, gyro_config, true, IMU_CALIBRATION,
@@ -65,10 +65,10 @@ int main() {
     OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0}  // TODO: tune gains
   );
 
-  robot->start_updating();
-
   btcontrol::init();
   btcontrol::register_gampad_behavior(on_gamepad_data);
+  
+  robot->start_updating();
   btcontrol::run_loop();
 
   return 0;
