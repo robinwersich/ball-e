@@ -17,7 +17,7 @@ void unregister_parameter(const std::string& name);
 
 /**
  * Starts polling the serial port for parameter updates.
- * This will use the second core of the pico.
+ * This function will not return, so it should be executed on core1
  */
 void start_updating();
 

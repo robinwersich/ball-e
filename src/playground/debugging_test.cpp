@@ -17,8 +17,4 @@ int main() {
   });
 
   parameters::start_updating();
-
-  while (true) {
-    sleep_ms(1000);
-  }
 }

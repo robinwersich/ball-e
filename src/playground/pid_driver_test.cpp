@@ -1,7 +1,8 @@
 #include "motor_driver_pid.h"
 #include "motor_drivers/dri0044.h"
-#include "pico/stdlib.h"
 #include "parameters.h"
+#include "pico/multicore.h"
+#include "pico/stdlib.h"
 
 const uint PWM_FREQUENCY = 25000;
 // -- motor 1 --
@@ -18,14 +19,10 @@ int main() {
   const PidGains pid_gains{.kp = 0.0, .ki = 0.0, .kd = 0.0};
   MotorDriverPid pid_driver{raw_driver, &decoder.state(), motor_spec, pid_gains, "m"};
 
-  parameters::register_parameter("speed", [&](float speed) {
-    pid_driver.drive(speed);
-  });
-  parameters::start_updating();
+  parameters::register_parameter("speed", [&](float speed) { pid_driver.drive(speed); });
+  multicore_launch_core1(parameters::start_updating);
 
-  while (true) {
-    sleep_ms(1000);
-  }
+  while (true) { sleep_ms(1000); }
 
   return 0;
 }

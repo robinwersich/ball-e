@@ -46,6 +46,7 @@ target_link_libraries(decoder_test
     pico_stdlib
     motor_hardware
     debugging
+    pico_multicore
 )
 
 pico_enable_stdio_usb(decoder_test 1)
@@ -66,6 +67,7 @@ target_link_libraries(velocity_test
     pico_stdlib
     motor_hardware
     debugging
+    pico_multicore
 )
 
 pico_enable_stdio_usb(velocity_test 1)
@@ -88,6 +90,7 @@ target_link_libraries(pid_driver_test
     motor_hardware
     pid
     debugging
+    pico_multicore
 )
 
 pico_enable_stdio_usb(pid_driver_test 1)

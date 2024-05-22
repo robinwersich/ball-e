@@ -4,13 +4,18 @@
 #include <map>
 
 #include "pico/stdlib.h"
-#include "pico/multicore.h"
 
-namespace {
+static std::map<std::string, std::function<void(float)>> parameter_setters;
 
-std::map<std::string, std::function<void(float)>> parameter_setters;
+namespace parameters {
 
-void update_parameters() {
+void register_parameter(const std::string& name, const std::function<void(float)>& setter) {
+  parameter_setters.emplace(name, setter);
+}
+
+void unregister_parameter(const std::string& name) { parameter_setters.erase(name); }
+
+void start_updating() {
   while (true) {
     std::string command;
     std::cin >> command;
@@ -29,20 +34,6 @@ void update_parameters() {
       printf("Unknown parameter: %s\n", name.c_str());
     }
   }
-}
-
-}
-
-namespace parameters {
-
-void register_parameter(const std::string& name, const std::function<void(float)>& setter) {
-  parameter_setters.emplace(name, setter);
-}
-
-void unregister_parameter(const std::string& name) { parameter_setters.erase(name); }
-
-void start_updating() {
-  multicore_launch_core1(update_parameters);
 }
 
 }

@@ -1,6 +1,7 @@
 #include "motor_decoder.h"
 #include "motor_drivers/dri0044.h"
 #include "parameters.h"
+#include "pico/multicore.h"
 #include "pico/stdlib.h"
 #include "plot.h"
 
@@ -33,7 +34,7 @@ int main() {
     motor2.drive(speed);
     motor3.drive(speed);
   });
-  parameters::start_updating();
+  multicore_launch_core1(parameters::start_updating);
 
   while (true) {
     sleep_ms(50);

@@ -2,6 +2,7 @@
 #include "motor_drivers/dri0044.h"
 #include "motor_state.h"
 #include "parameters.h"
+#include "pico/multicore.h"
 #include "pico/stdlib.h"
 #include "plot.h"
 
@@ -19,10 +20,8 @@ int main() {
   parameters::register_parameter("frequency", [&](float frequency) {
     motor->set_pwm_frequency(frequency);
   });
-  parameters::register_parameter("speed", [&](float speed) {
-    motor->drive(speed);
-  });
-  parameters::start_updating();
+  parameters::register_parameter("speed", [&](float speed) { motor->drive(speed); });
+  multicore_launch_core1(parameters::start_updating);
 
   while (true) {
     sleep_ms(10);
