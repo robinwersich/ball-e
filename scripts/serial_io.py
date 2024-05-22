@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 import threading
 import argparse
 from collections import defaultdict, deque
@@ -7,7 +8,6 @@ from matplotlib.quiver import Quiver
 from serial import Serial, SerialException
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from mpl_toolkits.mplot3d import Axes3D
 
 
 class Plotter:
@@ -78,12 +78,25 @@ class VectorViewer:
         plt.show()
 
 
+def load_parameters(serial: Serial, param_file: str | None) -> dict[str, str]:
+    if not param_file:
+        return {}
+    try:
+        with open(param_file, 'r') as f:
+            print(f"Reading parameters from {param_file}.")
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Parameter file {param_file} does not exist yet, will create.")
+        return {}
+
+
 def main():
     parser = argparse.ArgumentParser(description='Serial IO')
     parser.add_argument('-p', '--port', type=str, help='Serial port', default='/dev/ttyACM0')
     parser.add_argument('-b', '--baudrate', type=int, help='Baudrate', default=115200)
     parser.add_argument('-d', '--data-points', type=int, help='Max data points', default=1000)
     parser.add_argument('-m', '--mode', type=str, help='Display data over time or 3D vectors', choices=['plot', '3D'], default='plot')
+    parser.add_argument('-f', '--param-file', type=str, help='File for reading and writing parameters', required=False)
     args = parser.parse_args()
 
     try:
@@ -92,9 +105,17 @@ def main():
         print(f"Serial connection to {args.port} failed.")
         exit(1)
 
+    parameters = load_parameters(ser, args.param_file)
+    for key, value in parameters.items():
+        ser.write(f"set {key} {value}\n".encode())
+
+    stop_input = False
     def read_user_input():
-        while True:
+        while not stop_input:
             user_input = input() + '\n'
+            arguments = user_input.split()
+            if arguments[0] == 'set' and len(arguments) == 3:
+                parameters[arguments[1]] = arguments[2]
             ser.write(user_input.encode())
 
     try:
@@ -103,8 +124,14 @@ def main():
             Plotter(ser, args.data_points).show()
         elif args.mode == '3D':
             VectorViewer(ser).show()
+    except KeyboardInterrupt:
+        stop_input = True
     finally:
         ser.close()
+        if args.param_file:
+            print(f"\nWriting parameters to {args.param_file}.")
+            with open(args.param_file, 'w') as f:
+                json.dump(parameters, f)
 
 
 if __name__ == '__main__':
