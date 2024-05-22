@@ -37,13 +37,6 @@ class PidController {
    */
   PidController(float out_min, float out_max, PidGains gains = {}, const char* name = "");
 
-  ~PidController();
-
-#ifndef NDEBUG
-  PidController(PidController&& other);
-  PidController& operator=(PidController&& other);
-#endif
-
   void set_gains(PidGains gains);
   void set_proportional_gain(float kp);
   void set_integral_gain(float ki);
@@ -62,6 +55,20 @@ class PidController {
    */
   void reset();
 
+#ifndef NDEBUG
+  /**
+   * Registers tuning parameters for one or multiple controllers
+   * @param controllers The controllers to register tuning parameters for.
+   * @param name The suffix for the tuning parameters. If empty, the name of the controller is used.
+   */
+  static void register_parameters(
+    std::initializer_list<PidController*> controllers, const std::string& name = ""
+  );
+
+  /** Unregisters tuning parameters for all controllers registered with the given name. */
+  static void unregister_parameters(std::initializer_list<std::string> names);
+#endif
+
  private:
   uint32_t _sample_time_millis;
   float _kp, _ki, _kd;  // gains in C/M, C/(M*us), C/(M/us) to avoid unnecessary computations
@@ -76,11 +83,5 @@ class PidController {
 
 #ifndef NDEBUG
   std::string _name;
-
-  void register_parameters();
-  void unregister_parameters();
-
-  PidController& operator=(const PidController& other) = default;
-  PidController(const PidController& other) = default;
 #endif
 };

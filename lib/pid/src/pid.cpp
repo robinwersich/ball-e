@@ -18,32 +18,7 @@ PidController::PidController(float out_min, float out_max, PidGains gains, const
   , _name{name}
 #endif
 {
-#ifndef NDEBUG
-  register_parameters();
-#endif
 }
-
-PidController::~PidController() {
-#ifndef NDEBUG
-  unregister_parameters();
-#endif
-}
-
-#ifndef NDEBUG
-PidController::PidController(PidController&& other) : PidController(other) {
-  other.unregister_parameters();
-  other._name.clear();
-  register_parameters();
-}
-
-PidController& PidController::operator=(PidController&& other) {
-  *this = other;
-  other.unregister_parameters();
-  other._name.clear();
-  register_parameters();
-  return *this;
-}
-#endif
 
 void PidController::reset() {
   _i_term = 0;
@@ -70,7 +45,7 @@ float PidController::compute(float measurement, float target) {
 }
 
 bool PidController::is_initialized() const {
-  return not (std::isnan(_last_error) || std::isnan(_last_measurement) || _last_time_millis == 0);
+  return not(std::isnan(_last_error) || std::isnan(_last_measurement) || _last_time_millis == 0);
 }
 
 float PidController::compute(float measurement) {
@@ -114,24 +89,39 @@ float PidController::compute(float measurement) {
 }
 
 #ifndef NDEBUG
-void PidController::register_parameters() {
-  if (_name.empty()) return;
-
-  auto register_gain_param = [&](const std::string& prefix, void (PidController::*setter)(float)) {
-    parameters::register_parameter(prefix + _name, [this, setter](float value) {
-      (this->*setter)(value);
-    });
-  };
-
-  register_gain_param("kp_", &PidController::set_proportional_gain);
-  register_gain_param("ki_", &PidController::set_integral_gain);
-  register_gain_param("kd_", &PidController::set_derivative_gain);
+void PidController::register_parameters(
+  std::initializer_list<PidController*> controllers, const std::string& name
+) {
+  if (controllers.size() <= 1 or name.empty()) {
+    for (auto controller : controllers) {
+      const auto label = name.empty() ? controller->_name : name;
+      if (label.empty()) continue;
+      const auto register_gain = [&](auto prefix, auto setter) {
+        parameters::register_parameter(prefix + name, [=](float value) {
+          (controller->*setter)(value);
+        });
+      };
+      register_gain("kp_", &PidController::set_proportional_gain);
+      register_gain("ki_", &PidController::set_integral_gain);
+      register_gain("kd_", &PidController::set_derivative_gain);
+    }
+  } else {
+    const auto register_gain = [&](auto prefix, auto setter) {
+      parameters::register_parameter(prefix + name, [=](float value) {
+        for (auto controller : controllers) { (controller->*setter)(value); }
+      });
+    };
+    register_gain("kp_", &PidController::set_proportional_gain);
+    register_gain("ki_", &PidController::set_integral_gain);
+    register_gain("kd_", &PidController::set_derivative_gain);
+  }
 }
 
-void PidController::unregister_parameters() {
-  if (_name.empty()) return;
-  parameters::unregister_parameter("kp_" + _name);
-  parameters::unregister_parameter("ki_" + _name);
-  parameters::unregister_parameter("kd_" + _name);
+void PidController::unregister_parameters(std::initializer_list<std::string> names) {
+  for (const auto& name : names) {
+    parameters::unregister_parameter("kp_" + name);
+    parameters::unregister_parameter("ki_" + name);
+    parameters::unregister_parameter("kd_" + name);
+  }
 }
 #endif
