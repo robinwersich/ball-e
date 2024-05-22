@@ -8,6 +8,15 @@
 
 class Robot {
  public:
+  /**
+   * Creates a new robot instance.
+   * @param wheels The three omniwheels of the robot.
+   * @param orientation_estimator The orientation estimator to use for balancing.
+   * @param balance_gains The PID gains to use for balancing.
+   *  Units are S/g, S/(g·s), and S/(g/s) for kp, ki, and kd respectively
+   *  where S is the speed fraction of the robot and g is the gravity influence on each axis
+   * @note The robot will not start moving until `start_updating` is called.
+   */
   Robot(
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator,
     PidGains balance_gains
@@ -61,9 +70,16 @@ class Robot {
   repeating_timer_t _update_timer;
   critical_section_t _cs;
 
+  /** Updates the robot's orientation and movement (based on the current movement goal) */
   void update();
+  /** Updates the robots movement based on the desired speed */
   void update_ground();
+  /** Updates the robots movement based goal of balancing and achieving the desired speed */
   void update_balancing();
 
+  /** Directly makes the robot move in the given direction, speed and rotation. */
   void drive(float x, float y, float rot);
+
+  /** Calculates the gravity in g along the x and y axis of the robot, based on a down vector. */
+  static Eigen::Vector2f get_gravity_influence(const Eigen::Vector3f& down);
 };

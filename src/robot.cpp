@@ -1,5 +1,7 @@
 #include "robot.h"
 
+#include <cmath>
+
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator,
   PidGains balance_gains
@@ -65,9 +67,9 @@ void Robot::update_ground() { drive(_speed_x, _speed_y, _speed_rot); }
 
 void Robot::update_balancing() {
   const auto up = _orientation_estimator.up();
-  // to move the up vector, we need to move the robot in the opposite direction
-  const auto speed_x = -_pid_x.compute(up.x());
-  const auto speed_y = -_pid_y.compute(up.y());
+  const auto gravity_influence = get_gravity_influence(-up);
+  const auto speed_x = _pid_x.compute(gravity_influence.x());
+  const auto speed_y = _pid_y.compute(gravity_influence.y());
   // TODO: feed speed through motor PID controller
   drive(speed_x, speed_y, _speed_rot);
 }
@@ -85,4 +87,15 @@ bool Robot::is_balancing() const { return _balancing_mode; }
 
 void Robot::drive(float x, float y, float rot) {
   for (const auto& wheel : _wheels) { wheel.drive(x, y, rot); }
+}
+
+Eigen::Vector2f Robot::get_gravity_influence(const Eigen::Vector3f& down) {
+  // gravity influence on each axis is proportional to 1-abs(z) and cos/sin(theta) of the
+  // angle of the down vector in the xy plane
+
+  // scale x and y so that x² + y² = 1 to get the maximum gravity influence
+  const auto xy_scale = 1 / std::sqrt(1 - down.z() * down.z());
+  const auto max_gravity = Eigen::Vector2f{down.x(), down.y()} * xy_scale;
+
+  return max_gravity * (1 - std::abs(down.z()));
 }
