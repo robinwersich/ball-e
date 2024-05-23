@@ -79,7 +79,4 @@ class Robot {
 
   /** Directly makes the robot move in the given direction, speed and rotation. */
   void drive(float x, float y, float rot);
-
-  /** Calculates the gravity in g along the x and y axis of the robot, based on a down vector. */
-  static Eigen::Vector2f get_gravity_influence(const Eigen::Vector3f& down);
 };
