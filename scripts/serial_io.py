@@ -83,11 +83,22 @@ def load_parameters(serial: Serial, param_file: str | None) -> dict[str, str]:
         return {}
     try:
         with open(param_file, 'r') as f:
-            print(f"Reading parameters from {param_file}.")
-            return json.load(f)
+            parameters = json.load(f)
+            print(f"Reading parameters from {param_file}:")
+            print(', '.join(f"{key}={value}" for key, value in parameters.items()))
+            return parameters
     except FileNotFoundError:
         print(f"Parameter file {param_file} does not exist yet, will create.")
         return {}
+
+
+def save_parameters(parameters: dict[str, str], param_file: str):
+    if not param_file:
+        return
+    print(f"Writing parameters to {param_file}:")
+    print(', '.join(f"{key}={value}" for key, value in parameters.items()))
+    with open(param_file, 'w') as f:
+        json.dump(parameters, f)
 
 
 def main():
@@ -126,12 +137,10 @@ def main():
             VectorViewer(ser).show()
     except KeyboardInterrupt:
         stop_input = True
+        print()
     finally:
         ser.close()
-        if args.param_file:
-            print(f"\nWriting parameters to {args.param_file}.")
-            with open(args.param_file, 'w') as f:
-                json.dump(parameters, f)
+        save_parameters(parameters, args.param_file)
 
 
 if __name__ == '__main__':
