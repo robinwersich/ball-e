@@ -97,7 +97,7 @@ void PidController::register_parameters(
       const auto label = name.empty() ? controller->_name : name;
       if (label.empty()) continue;
       const auto register_gain = [&](auto prefix, auto setter) {
-        parameters::register_parameter(prefix + name, [=](float value) {
+        parameters::register_parameter(prefix + label, [=](float value) {
           (controller->*setter)(value);
         });
       };

@@ -16,6 +16,10 @@ void register_parameter(const std::string& name, const std::function<void(float)
 void unregister_parameter(const std::string& name) { parameter_setters.erase(name); }
 
 void start_updating() {
+  // list listened parameteters
+  printf("Listening to parameters:\n");
+  for (const auto& [name, _] : parameter_setters) printf("- %s\n", name.c_str());
+
   while (true) {
     std::string command;
     std::cin >> command;
