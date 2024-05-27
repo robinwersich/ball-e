@@ -34,8 +34,7 @@ float MotorState::compute_speed_tps() {
     // possibly we are just polling too fast and the motor is still moving
     if (time_us_32() - current_count_micros < _max_sync_tick_interval) return _last_speed_tps;
     // otherwise it means motor has stopped
-    // set last timestamp to now for more accurate velocity when motor starts again
-    _last_count_micros = time_us_32();
+    _last_count_micros = time_us_32() - _max_sync_tick_interval;
     return _last_speed_tps = 0;
   }
 
