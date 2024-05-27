@@ -1,7 +1,6 @@
 #include "motor_driver_pid.h"
 #include "motor_drivers/dri0044.h"
 #include "parameters.h"
-#include "pico/multicore.h"
 #include "pico/stdlib.h"
 
 const uint PWM_FREQUENCY = 25000;
@@ -22,9 +21,7 @@ int main() {
 
   parameters::register_parameter("speed", [&](float speed) { pid_driver.drive(speed); });
   sleep_ms(2000);
-  multicore_launch_core1(parameters::start_updating);
-
-  while (true) { sleep_ms(1000); }
+  parameters::start_updating();
 
   return 0;
 }

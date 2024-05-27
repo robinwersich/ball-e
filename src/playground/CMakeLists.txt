@@ -90,7 +90,6 @@ target_link_libraries(pid_driver_test
     motor_hardware
     pid
     debugging
-    pico_multicore
 )
 
 pico_enable_stdio_usb(pid_driver_test 1)
