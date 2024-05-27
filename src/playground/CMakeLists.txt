@@ -195,3 +195,26 @@ pico_enable_stdio_usb(imu_calibration 1)
 pico_enable_stdio_uart(imu_calibration 0)
 
 pico_add_extra_outputs(imu_calibration)
+
+
+# --- kickstart driver test ---
+add_executable(kickstart_driver_test
+    kickstart_driver_test.cpp
+    ../motor_driver_kickstart.cpp
+)
+
+target_include_directories(kickstart_driver_test PRIVATE
+    ..
+)
+
+target_link_libraries(kickstart_driver_test
+    pico_stdlib
+    debugging
+    motor_hardware
+    pico_multicore
+)
+
+pico_enable_stdio_usb(kickstart_driver_test 1)
+pico_enable_stdio_uart(kickstart_driver_test 0)
+
+pico_add_extra_outputs(kickstart_driver_test)
