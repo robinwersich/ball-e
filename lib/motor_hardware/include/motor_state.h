@@ -12,10 +12,10 @@ class MotorState {
    * @param decoder_state The decoder state from which to read ticks.
    * @param ticks_per_revolution The number of ticks the encoder produces per motor revolution.
    * @param gear_ratio How many rotations of the motor are required for one shaft rotation.
-   * @param min_rpm The minimum RPM the motor can achieve. Based on this, the speed computation
+   * @param min_rpm The minimum non-zero RPM the motor can achieve. Based on this, the speed computation
    *  will avoid returning a false zero speed at high polling rates when the motor is moving slowly.
    */
-  MotorState(const MotorDecoderState* decoder_state, float ticks_per_revolution, float gear_ratio, float min_rpm = 0.0);
+  MotorState(const MotorDecoderState* decoder_state, float ticks_per_revolution, float gear_ratio, float min_rpm);
 
   /** Returns the current position in terms of revolutions since start of measurement. */
   double current_position_revs();

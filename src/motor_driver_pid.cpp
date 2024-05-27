@@ -7,7 +7,9 @@ MotorDriverPid::MotorDriverPid(
   : _driver{std::move(driver)}
   , _max_speed{motor_spec.max_rpm}
   , _controller{-1.0, 1.0, pid_gains, name}
-  , _motor_state{decoder_state, motor_spec.ticks_per_revolution, motor_spec.gear_ratio} {
+  , _motor_state{
+      decoder_state, motor_spec.ticks_per_revolution, motor_spec.gear_ratio, motor_spec.min_rpm
+    } {
   add_repeating_timer_ms(
     MotorDriverPid::sample_time_millis,
     [](repeating_timer_t* timer) {

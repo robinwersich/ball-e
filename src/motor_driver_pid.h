@@ -17,6 +17,8 @@ struct MotorSpec {
   float gear_ratio;
   // The maximum speed the output shaft can achieve in revolutions per minute.
   float max_rpm;
+  // The minimum non-zero speed the output shaft can achieve
+  float min_rpm;
 };
 
 /**
