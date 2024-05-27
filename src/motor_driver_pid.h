@@ -47,7 +47,7 @@ class MotorDriverPid : public MotorDriver {
    *  If given, the PID gains will be registered as tuning parameters with this name.
    */
   MotorDriverPid(
-    std::shared_ptr<MotorDriver> driver, const MotorDecoderState* decoder_state,
+    std::unique_ptr<MotorDriver> driver, const MotorDecoderState* decoder_state,
     MotorSpec motor_spec, PidGains pid_gains, const char* name = ""
   );
   /** Unregisters the timer interrupt for updating the controller. */
@@ -65,7 +65,7 @@ class MotorDriverPid : public MotorDriver {
   PidController& controller();
 
  private:
-  std::shared_ptr<MotorDriver> _driver;
+  std::unique_ptr<MotorDriver> _driver;
   PidController _controller;
   MotorState _motor_state;
   float _max_speed;

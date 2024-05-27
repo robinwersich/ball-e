@@ -15,9 +15,9 @@ const uint ENC_SLOT = 1;
 int main() {
   stdio_init_all();
 
-  auto raw_driver = std::make_shared<MotorDriverDRI0044>(PWM, DIR, PWM_FREQUENCY);
+  auto raw_driver = std::make_unique<MotorDriverDRI0044>(PWM, DIR, PWM_FREQUENCY);
   const Kickstart kickstart{.start_threshold = 0.0, .end_threshold = 0.0, .duration_ms = 0};
-  KickstartMotorDriver kickstart_driver{raw_driver, kickstart};
+  KickstartMotorDriver kickstart_driver{std::move(raw_driver), kickstart};
 
   auto decoder = MotorDecoder(ENC_SLOT);
   MotorState motor_state{&decoder.state(), 6, 115, 1};

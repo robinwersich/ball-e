@@ -1,7 +1,7 @@
 #include "motor_driver_kickstart.h"
 
 KickstartMotorDriver::KickstartMotorDriver(
-  std::shared_ptr<MotorDriver> driver, const Kickstart& kickstart
+  std::unique_ptr<MotorDriver> driver, const Kickstart& kickstart
 )
   : _driver(std::move(driver)), _kickstart(kickstart) {}
 

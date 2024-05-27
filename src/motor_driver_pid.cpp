@@ -1,7 +1,7 @@
 #include "motor_driver_pid.h"
 
 MotorDriverPid::MotorDriverPid(
-  std::shared_ptr<MotorDriver> driver, const MotorDecoderState* decoder_state, MotorSpec motor_spec,
+  std::unique_ptr<MotorDriver> driver, const MotorDecoderState* decoder_state, MotorSpec motor_spec,
   PidGains pid_gains, const char* name
 )
   : _driver{std::move(driver)}
