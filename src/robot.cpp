@@ -70,8 +70,12 @@ void Robot::update_balancing() {
   const auto down = -_orientation_estimator.up();
   const auto speed_x = _pid_x.compute(down.x());
   const auto speed_y = _pid_y.compute(down.y());
+  // because of physics (tm), the effect of the motor movement on the angle is proportional
+  // to cos²(angle) = 1 - sin²(angle) = 1 - down²
+  const auto efficiency_x = 1 - down.x() * down.x();
+  const auto efficiency_y = 1 - down.y() * down.y();
   // TODO: feed speed through motor PID controller
-  drive(speed_x, speed_y, _speed_rot);
+  drive(speed_x / efficiency_x, speed_y / efficiency_y, _speed_rot);
 }
 
 void Robot::set_balancing(bool enabled) {
