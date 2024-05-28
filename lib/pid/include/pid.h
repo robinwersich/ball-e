@@ -31,7 +31,7 @@ class PidController {
    * @param out_min The minimum value the controlled plant can accept.
    * @param out_max The maximum value the controlled plant can accept.
    * @param gains The proportional, integral, and derivative gain for the controller.
-   * @param category The name of this controller.
+   * @param name The name of this controller.
    *   In debug mode, tuning parameters will be registered for each controller with a name:
    *   kp_<name>, ki_<name>, kd_<name>
    */
