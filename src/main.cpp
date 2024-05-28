@@ -61,7 +61,7 @@ int main() {
     Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
   );
 
-  Kickstart kickstart{.start_threshold = 0.3, .end_threshold = 0.06, .duration_ms = 20};
+  Kickstart kickstart{.start_threshold = 0.4, .end_threshold = 0.15, .duration_ms = 10};
 
   robot = std::make_unique<Robot>(
     std::array<Omniwheel, 3>{
