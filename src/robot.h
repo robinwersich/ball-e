@@ -51,9 +51,9 @@ class Robot {
   /** Enables or disables the ball balancing mode. */
   void set_balancing(bool enabled);
   /** Toggles the ball balancing mode. */
-  void toggle_balancing();
+  void toggle_balancing() { _balancing_mode = !_balancing_mode; }
   /** Returns true if the robot is currently balancing. */
-  bool is_balancing() const;
+  bool is_balancing() const { return _balancing_mode; }
 
   /** Sets up a timer interrupt for handling the robot movement. */
   void start_updating();

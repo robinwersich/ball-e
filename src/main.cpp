@@ -1,5 +1,6 @@
 #include "btcontrol.h"
 #include "imu_calibration_values.h"
+#include "motor_driver_kickstart.h"
 #include "motor_drivers/dri0044.h"
 #include "pico/critical_section.h"
 #include "pico/stdlib.h"
@@ -36,7 +37,7 @@ void on_gamepad_data(const uni_gamepad_t& gamepad) {
   const float speed_y = gamepad.axis_y / 512.0;
   const float speed_rot = (gamepad.throttle - gamepad.brake) / 1024.0;
 
-  robot->set_speed(speed_x, speed_y, -speed_rot); //  should spin clockwise when throttle is pressed
+  robot->set_speed(speed_x, speed_y, -speed_rot);  // should spin clockwise when throttle is pressed
 }
 
 int main() {
@@ -49,18 +50,36 @@ int main() {
   irq_set_priority(TIMER_IRQ_3, PICO_DEFAULT_IRQ_PRIORITY + 1);
 
   using namespace lsm6;
-  LSM6::AccelConfig accel_config{.odr = odr::HZ_104, .fs = fs::acc::G_2};
-  LSM6::GyroConfig gyro_config{.odr = odr::HZ_104, .fs = fs::gyro::DPS_1000};
+  LSM6::AccelConfig accel_config{
+    .odr = odr::HZ_104, .fs = fs::acc::G_2, .lp_cutoff = cutoff::accel::CO_45
+  };
+  LSM6::GyroConfig gyro_config{
+    .odr = odr::HZ_104, .fs = fs::gyro::DPS_1000, .lp_intensity = cutoff::gyro::CO_7
+  };
   const auto imu = std::make_shared<LSM6>(
     7, accel_config, gyro_config, true, IMU_CALIBRATION,
     Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
   );
 
+  Kickstart kickstart{.start_threshold = 0.3, .end_threshold = 0.06, .duration_ms = 20};
+
   robot = std::make_unique<Robot>(
     std::array<Omniwheel, 3>{
-      Omniwheel(30, std::make_unique<MotorDriverDRI0044>(PWM1, DIR1, PWM_FREQUENCY, true)),
-      Omniwheel(150, std::make_unique<MotorDriverDRI0044>(PWM2, DIR2, PWM_FREQUENCY)),
-      Omniwheel(270, std::make_unique<MotorDriverDRI0044>(PWM3, DIR3, PWM_FREQUENCY)),
+      Omniwheel(
+        30, std::make_unique<KickstartMotorDriver>(
+              std::make_unique<MotorDriverDRI0044>(PWM1, DIR1, PWM_FREQUENCY, true), kickstart
+            )
+      ),
+      Omniwheel(
+        150, std::make_unique<KickstartMotorDriver>(
+               std::make_unique<MotorDriverDRI0044>(PWM2, DIR2, PWM_FREQUENCY), kickstart
+             )
+      ),
+      Omniwheel(
+        270, std::make_unique<KickstartMotorDriver>(
+               std::make_unique<MotorDriverDRI0044>(PWM3, DIR3, PWM_FREQUENCY), kickstart
+             )
+      )
     },
     OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0}  // TODO: tune gains
   );

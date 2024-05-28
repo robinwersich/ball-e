@@ -86,9 +86,6 @@ void Robot::set_balancing(bool enabled) {
   _balancing_mode = enabled;
 }
 
-void Robot::toggle_balancing() { _balancing_mode = !_balancing_mode; }
-bool Robot::is_balancing() const { return _balancing_mode; }
-
 void Robot::drive(float x, float y, float rot) {
   for (const auto& wheel : _wheels) { wheel.drive(x, y, rot); }
 }

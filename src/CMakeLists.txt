@@ -4,6 +4,7 @@ add_executable(robot_firmware
     main.cpp
     robot.cpp
     omniwheel.cpp
+    motor_driver_kickstart.cpp
 )
 
 target_link_libraries(robot_firmware
