@@ -2,11 +2,11 @@
 
 MotorDriverPid::MotorDriverPid(
   std::unique_ptr<MotorDriver> driver, const MotorDecoderState* decoder_state, MotorSpec motor_spec,
-  PidGains pid_gains, const char* name
+  PidGains pid_gains, const std::optional<LowPassFilter>& filter, const char* name
 )
   : _driver{std::move(driver)}
   , _max_speed{motor_spec.max_rpm}
-  , _controller{-1.0, 1.0, pid_gains, name}
+  , _controller{-1.0, 1.0, pid_gains, filter, name}
   , _motor_state{
       decoder_state, motor_spec.ticks_per_revolution, motor_spec.gear_ratio, motor_spec.min_rpm
     } {

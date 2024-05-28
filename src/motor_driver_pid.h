@@ -43,12 +43,14 @@ class MotorDriverPid : public MotorDriver {
    * @param pid_gains The proportional, integral, and derivative gains for the PID controller.
    *  Units are VM/(rev/s), VM/rev, and VM/(rev/s²) for kp, ki, and kd respectively.
    *  where VM is the maximum output voltage of the motor driver.
+   * @param filter An optional low-pass filter to apply to the control signal.
    * @param name The name of the controller for debugging purposes.
    *  If given, the PID gains will be registered as tuning parameters with this name.
    */
   MotorDriverPid(
     std::unique_ptr<MotorDriver> driver, const MotorDecoderState* decoder_state,
-    MotorSpec motor_spec, PidGains pid_gains, const char* name = ""
+    MotorSpec motor_spec, PidGains pid_gains, const std::optional<LowPassFilter>& filter = {},
+    const char* name = ""
   );
   /** Unregisters the timer interrupt for updating the controller. */
   ~MotorDriverPid();

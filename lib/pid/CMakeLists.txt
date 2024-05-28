@@ -1,5 +1,6 @@
 add_library(pid STATIC
   ./src/pid.cpp
+  ./src/lowpass.cpp
 )
 
 target_include_directories(pid PUBLIC

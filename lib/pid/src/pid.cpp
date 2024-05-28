@@ -8,12 +8,16 @@
 #endif
 #include "pico/stdlib.h"
 
-PidController::PidController(float out_min, float out_max, PidGains gains, const char* name)
+PidController::PidController(
+  float out_min, float out_max, PidGains gains, const std::optional<LowPassFilter>& filter,
+  const char* name
+)
   : _out_min{out_min}
   , _out_max{out_max}
   , _kp{gains.kp}
   , _ki{gains.ki / 10e6f}  // convert from C/(M*s) to C/(M*us)
   , _kd{gains.kd * 10e6f}  // convert from C/(M/s) to C/(M/us)
+  , _filter{filter}
 #ifndef NDEBUG
   , _name{name}
 #endif
@@ -25,6 +29,7 @@ void PidController::reset() {
   _last_error = std::numeric_limits<float>::quiet_NaN();
   _last_measurement = std::numeric_limits<float>::quiet_NaN();
   _last_time_millis = 0;
+  _filter->reset();
 }
 
 void PidController::set_gains(PidGains gains) {
@@ -49,6 +54,8 @@ bool PidController::is_initialized() const {
 }
 
 float PidController::compute(float measurement) {
+  if (_filter) measurement = _filter->filter(measurement);
+
   if (not is_initialized()) {
     _last_error = _target - measurement;
     _last_measurement = measurement;

@@ -218,3 +218,21 @@ pico_enable_stdio_usb(kickstart_driver_test 1)
 pico_enable_stdio_uart(kickstart_driver_test 0)
 
 pico_add_extra_outputs(kickstart_driver_test)
+
+# --- lp filter test ---
+add_executable(lp_filter_test
+    lp_filter_test.cpp
+)
+
+target_link_libraries(lp_filter_test
+    pico_stdlib
+    pico_multicore
+    motor_hardware
+    pid
+    debugging
+)
+
+pico_enable_stdio_usb(lp_filter_test 1)
+pico_enable_stdio_uart(lp_filter_test 0)
+
+pico_add_extra_outputs(lp_filter_test)
