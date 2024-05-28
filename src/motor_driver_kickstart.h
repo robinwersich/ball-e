@@ -41,6 +41,7 @@ class KickstartMotorDriver : public MotorDriver {
   std::unique_ptr<MotorDriver> _driver;
   Kickstart _kickstart;
   float _current_speed = 0;
+  alarm_id_t _current_kickstart_id = 0;
 
   void drive_at_set_speed();
 };
