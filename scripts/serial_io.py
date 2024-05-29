@@ -23,7 +23,10 @@ class Plotter:
             if not line.startswith('$p '):
                 print(line)
                 continue
-            data_id, timestamp, value = line.removeprefix('$p ').split(',')
+            data_id, timestamp, value, *rest = line.removeprefix('$p ').split(',')
+            if len(rest) > 0:
+                print(f"Skipping corrupted line: {line}")
+                continue
 
             self.timestamps[data_id].append(float(timestamp))
             self.values[data_id].append(float(value))
