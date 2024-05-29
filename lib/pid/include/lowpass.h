@@ -26,6 +26,9 @@ class LowPassFilter {
    */
   float filter(float signal);
 
+  /** Returns the derivative of the filtered input signal. */
+  float filtered_derivative(float signal, float dt);
+
   /** Resets the internal state of the filter. */
   void reset();
 

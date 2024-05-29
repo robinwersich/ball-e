@@ -54,12 +54,11 @@ bool PidController::is_initialized() const {
 }
 
 float PidController::compute(float measurement) {
-  if (_filter) measurement = _filter->filter(measurement);
-
   if (not is_initialized()) {
     _last_error = _target - measurement;
     _last_measurement = measurement;
     _last_time_millis = time_us_32();
+    if (_filter) _filter->filter(measurement);
     return 0;
   }
 
@@ -72,7 +71,8 @@ float PidController::compute(float measurement) {
   // prevent integral windup
   _i_term = std::clamp(_i_term, _out_min, _out_max);
   // derivative on measurement (not error) to prevent derivative kick
-  const auto measurement_change = (measurement - _last_measurement) / dt;
+  const auto measurement_change = _filter ? _filter->filtered_derivative(measurement, dt)
+                                          : (measurement - _last_measurement) / dt;
   const auto p_term = error * _kp;
   const auto i_term = _i_term;
   const auto d_term = -measurement_change * _kd;

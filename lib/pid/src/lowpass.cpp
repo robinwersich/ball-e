@@ -9,6 +9,11 @@ float LowPassFilter::filter(float signal) {
   return output;
 }
 
+float LowPassFilter::filtered_derivative(float signal, float dt) {
+  const auto prev_output = _prev_output;
+  return (filter(signal) - prev_output) / dt;
+}
+
 void LowPassFilter::reset() {
   _prev_signal = 0;
   _prev_output = 0;
