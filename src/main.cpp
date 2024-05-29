@@ -81,7 +81,8 @@ int main() {
              )
       )
     },
-    OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0}  // TODO: tune gains
+    OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0},
+    LowPassFilter{{.a1 = 0.85956724, .b0 = 0.07021638, .b1 = 0.07021638}}
   );
 
   btcontrol::init();

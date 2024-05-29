@@ -4,12 +4,12 @@
 
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator,
-  PidGains balance_gains
+  PidGains balance_gains, std::optional<LowPassFilter> balance_filter
 )
   : _wheels{std::move(wheels)}
   , _orientation_estimator{std::move(orientation_estimator)}
-  , _pid_x{-1, 1, balance_gains}
-  , _pid_y{-1, 1, balance_gains} {
+  , _pid_x{-1, 1, balance_gains, balance_filter}
+  , _pid_y{-1, 1, balance_gains, balance_filter} {
   critical_section_init(&_cs);
 }
 
@@ -49,7 +49,7 @@ void Robot::start_updating() {
   add_repeating_timer_us(
     _orientation_estimator.update_period_us(),
     [](repeating_timer_t* rt) {
-      reinterpret_cast<Robot*>(rt->user_data)->update();
+      static_cast<Robot*>(rt->user_data)->update();
       return true;
     },
     this, &_update_timer

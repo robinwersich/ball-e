@@ -15,11 +15,12 @@ class Robot {
    * @param balance_gains The PID gains to use for balancing.
    *  Units are S/g, S/(g·s), and S/(g/s) for kp, ki, and kd respectively
    *  where S is the speed fraction of the robot and g is the gravity influence on each axis
+   * @param balance_filter An optional low-pass filter to apply to the orientation signal.
    * @note The robot will not start moving until `start_updating` is called.
    */
   Robot(
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator,
-    PidGains balance_gains
+    PidGains balance_gains, std::optional<LowPassFilter> balance_filter = {}
   );
   ~Robot();
 
@@ -59,6 +60,11 @@ class Robot {
   void start_updating();
   /** Stops the timer interrupt for handling the robot movement. */
   void stop_updating();
+
+  /** Returns the PID controller for the x-axis  */
+  PidController& pid_x() { return _pid_x; }
+  /** Returns the PID controller for the y-axis  */
+  PidController& pid_y() { return _pid_y; }
 
  private:
   std::array<Omniwheel, 3> _wheels;
