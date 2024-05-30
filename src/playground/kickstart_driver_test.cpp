@@ -20,7 +20,7 @@ int main() {
   KickstartMotorDriver kickstart_driver{std::move(raw_driver), kickstart};
 
   auto decoder = MotorDecoder(ENC_SLOT);
-  MotorState motor_state{&decoder.state(), 6, 115, 1};
+  MotorState motor_state{&decoder.state(), 6, 115};
 
   parameters::register_parameter("speed", [&](float speed) { kickstart_driver.drive(speed); });
   parameters::register_parameter("start_threshold", [&](float start_threshold) {

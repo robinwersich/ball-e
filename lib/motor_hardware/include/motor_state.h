@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "lowpass.h"
 #include "motor_decoder.h"
 
 /** Measures motor position and velocity based on decoder readings. */
@@ -12,10 +13,12 @@ class MotorState {
    * @param decoder_state The decoder state from which to read ticks.
    * @param ticks_per_revolution The number of ticks the encoder produces per motor revolution.
    * @param gear_ratio How many rotations of the motor are required for one shaft rotation.
-   * @param min_rpm The minimum non-zero RPM the motor can achieve. Based on this, the speed computation
-   *  will avoid returning a false zero speed at high polling rates when the motor is moving slowly.
+   * @param speed_filter An optional low-pass filter to apply to the speed measurement.
    */
-  MotorState(const MotorDecoderState* decoder_state, float ticks_per_revolution, float gear_ratio, float min_rpm);
+  MotorState(
+    const MotorDecoderState* decoder_state, float ticks_per_revolution, float gear_ratio,
+    const LowPassCoefficients& speed_filter = {}
+  );
 
   /** Returns the current position in terms of revolutions since start of measurement. */
   double current_position_revs();
@@ -32,8 +35,7 @@ class MotorState {
  private:
   const MotorDecoderState* _decoder_state;
   uint32_t _last_count_micros = 0;
-  int32_t _last_count = 0;
-  float _last_speed_tps = 0;
+  float _last_count = 0;
   float _revolutions_per_tick;  // shaft revolutions
-  uint32_t _max_sync_tick_interval;
+  LowPassFilter _speed_filter;
 };

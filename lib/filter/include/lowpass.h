@@ -7,11 +7,11 @@
  */
 struct LowPassCoefficients {
   /** Factor for the previous output. */
-  float a1;
+  float a1 = 0;
   /** Factor for the current signal. */
-  float b0;
+  float b0 = 1;
   /** Factor for the previous signal. */
-  float b1;
+  float b1 = 0;
 };
 
 /** This implements a simple first order low pass filter. */

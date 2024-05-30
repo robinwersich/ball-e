@@ -16,15 +16,21 @@ int main() {
 
   auto motor = std::make_shared<MotorDriverDRI0044>(PWM, DIR, 25000);
   auto decoder = MotorDecoder(ENC_SLOT);
-  MotorState motor_state{&decoder.state(), 6, 115, 1};
-  LowPassFilter filter{{.a1 = 0.7284895, .b0 = 0.13575525, .b1 = 0.13575525}};
+  LowPassCoefficients coefficients{.a1 = 0.88176521, .b0 = 0.0591174, .b1 = 0.0591174};
+  MotorState motor_state_pre{
+    &decoder.state(), 6, 115,
+    coefficients
+  };
+  MotorState motor_state_post{&decoder.state(), 6, 115};
+  LowPassFilter post_filter{coefficients};
 
   parameters::register_parameter("speed", [&](float speed) { motor->drive(speed); });
   multicore_launch_core1(parameters::start_updating);
 
   while (true) {
-    sleep_ms(5);
-    plot("speed", filter.filter(motor_state.compute_speed_rpm()));
+    sleep_ms(10);
+    plot("speed_pre_filtered", motor_state_pre.compute_speed_rpm());
+    plot("speed_post_filtered", post_filter.filter(motor_state_post.compute_speed_rpm()));
   }
 
   return 0;

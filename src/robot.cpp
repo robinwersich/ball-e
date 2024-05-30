@@ -7,7 +7,7 @@
 
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-  float encoder_gain, std::optional<LowPassFilter> balance_filter
+  float encoder_gain, LowPassCoefficients balance_filter
 )
   : _wheels{std::move(wheels)}
   , _orientation_estimator{std::move(orientation_estimator)}

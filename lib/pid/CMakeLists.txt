@@ -1,6 +1,5 @@
 add_library(pid STATIC
   ./src/pid.cpp
-  ./src/lowpass.cpp
 )
 
 target_include_directories(pid PUBLIC
@@ -10,6 +9,7 @@ target_include_directories(pid PUBLIC
 target_link_libraries(pid
   PUBLIC
     pico_stdlib
+    filter
   PRIVATE
     debug debugging
 )

@@ -15,7 +15,7 @@ int main() {
 
   auto motor = std::make_shared<MotorDriverDRI0044>(PWM, DIR, 25000);
   auto decoder = MotorDecoder(ENC_SLOT);
-  MotorState motor_state{&decoder.state(), 6, 115, 1};
+  MotorState motor_state{&decoder.state(), 6, 115};
 
   parameters::register_parameter("frequency", [&](float frequency) {
     motor->set_pwm_frequency(frequency);

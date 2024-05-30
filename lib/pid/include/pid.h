@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath>
-#include <optional>
 #ifndef NDEBUG
 #include <map>
 #include <string>
@@ -37,7 +36,7 @@ class PidController {
    *   In debug mode, tuning parameters will be registered for each controller with a name:
    *   kp_<name>, ki_<name>, kd_<name>
    */
-  PidController(float out_min, float out_max, PidGains gains = {}, const std::optional<LowPassFilter>& filter = {}, const char* name = "");
+  PidController(float out_min, float out_max, PidGains gains = {}, const LowPassCoefficients& filter = {}, const char* name = "");
 
   void set_gains(PidGains gains);
   void set_proportional_gain(float kp);
@@ -76,11 +75,10 @@ class PidController {
   float _kp, _ki, _kd;  // gains in C/M, C/(M*us), C/(M/us) to avoid unnecessary computations
   float _out_min, _out_max;
   float _i_term = 0.0;  // error sum multiplied by ki
-  float _last_error = NAN;
+  float _last_error = 0;
   float _target = 0.0;
-  float _last_measurement = NAN;
   uint32_t _last_time_millis = 0;  // 0 means uninitialized
-  std::optional<LowPassFilter> _filter;
+  LowPassFilter _filter;
 
   bool is_initialized() const;
 

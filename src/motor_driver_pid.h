@@ -49,7 +49,7 @@ class MotorDriverPid : public MotorDriver {
    */
   MotorDriverPid(
     std::unique_ptr<MotorDriver> driver, const MotorDecoderState* decoder_state,
-    MotorSpec motor_spec, PidGains pid_gains, const std::optional<LowPassFilter>& filter = {},
+    MotorSpec motor_spec, PidGains pid_gains, const LowPassCoefficients& filter = {},
     const char* name = ""
   );
   /** Unregisters the timer interrupt for updating the controller. */

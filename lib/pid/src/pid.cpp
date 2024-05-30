@@ -9,7 +9,7 @@
 #include "pico/stdlib.h"
 
 PidController::PidController(
-  float out_min, float out_max, PidGains gains, const std::optional<LowPassFilter>& filter,
+  float out_min, float out_max, PidGains gains, const LowPassCoefficients& filter,
   const char* name
 )
   : _out_min{out_min}
@@ -26,10 +26,8 @@ PidController::PidController(
 
 void PidController::reset() {
   _i_term = 0;
-  _last_error = std::numeric_limits<float>::quiet_NaN();
-  _last_measurement = std::numeric_limits<float>::quiet_NaN();
   _last_time_millis = 0;
-  _filter->reset();
+  _filter.reset();
 }
 
 void PidController::set_gains(PidGains gains) {
@@ -50,15 +48,14 @@ float PidController::compute(float measurement, float target) {
 }
 
 bool PidController::is_initialized() const {
-  return not(std::isnan(_last_error) || std::isnan(_last_measurement) || _last_time_millis == 0);
+  return _last_time_millis != 0;
 }
 
 float PidController::compute(float measurement) {
   if (not is_initialized()) {
     _last_error = _target - measurement;
-    _last_measurement = measurement;
     _last_time_millis = time_us_32();
-    if (_filter) _filter->filter(measurement);
+    _filter.filter(measurement);
     return 0;
   }
 
@@ -71,14 +68,12 @@ float PidController::compute(float measurement) {
   // prevent integral windup
   _i_term = std::clamp(_i_term, _out_min, _out_max);
   // derivative on measurement (not error) to prevent derivative kick
-  const auto measurement_change = _filter ? _filter->filtered_derivative(measurement, dt)
-                                          : (measurement - _last_measurement) / dt;
+  const auto measurement_change = _filter.filtered_derivative(measurement, dt);
   const auto p_term = error * _kp;
   const auto i_term = _i_term;
   const auto d_term = -measurement_change * _kd;
 
   _last_error = error;
-  _last_measurement = measurement;
 
   const auto output = std::clamp(p_term + i_term + d_term, _out_min, _out_max);
 #ifndef NDEBUG
