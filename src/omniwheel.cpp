@@ -2,22 +2,27 @@
 
 #include <cmath>
 
-Omniwheel::Omniwheel(float angle, std::unique_ptr<MotorDriver> motor_driver, bool swap_direction)
-  : _wheel_rotation{Eigen::Rotation2Df(-angle * M_PI / 180)}
+Omniwheel::Omniwheel(
+  float angle, std::unique_ptr<MotorDriver> motor_driver, const MotorState& motor_state
+)
+  : _wheel_direction{-std::sin(angle / 180 * M_PI), std::cos(angle / 180 * M_PI)}
   , _motor_driver{std::move(motor_driver)}
-  , _swap_direction{swap_direction} {}
+  , _motor_state{motor_state} {}
 
-void Omniwheel::drive(float x, float y, float forward) const {
-  auto v = _wheel_rotation * Eigen::Vector2f{{x, y}};
-  
-  const auto abs_speed = v.norm() + std::abs(forward);
-  auto main_axis_speed = v.y() + forward;
-  if (abs_speed > 1) main_axis_speed /= abs_speed;
-  drive(main_axis_speed);
+void Omniwheel::drive(const Eigen::Vector2f& global_speed, float local_speed) const {
+  drive(get_local_speed(global_speed) + local_speed);
 }
 
-void Omniwheel::drive(float x, float y) const { drive(x, y, 0); }
+void Omniwheel::drive(const Eigen::Vector2f& speed) const { drive(speed, 0); }
 
-void Omniwheel::drive(float speed) const { _motor_driver->drive(_swap_direction ? -speed : speed); }
+void Omniwheel::drive(float speed) const { _motor_driver->drive(speed); }
 
 void Omniwheel::stop() const { _motor_driver->stop(); }
+
+Eigen::Vector2f Omniwheel::compute_speed() {
+  return _motor_state.compute_speed_rps() * _wheel_direction;
+}
+
+float Omniwheel::get_local_speed(const Eigen::Vector2f global_speed) const {
+  return global_speed.dot(_wheel_direction);
+}
