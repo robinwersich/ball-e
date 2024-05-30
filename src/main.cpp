@@ -75,9 +75,9 @@ int main() {
   );
 
   // setup motor decoders
-  MotorDecoder decoder_1{ENC1_SLOT};
+  MotorDecoder decoder_1{ENC1_SLOT, true};
   MotorDecoder decoder_2{ENC2_SLOT};
-  MotorDecoder decoder_3{ENC3_SLOT};
+  MotorDecoder decoder_3{ENC3_SLOT, true};
   LowPassCoefficients velocity_filter{.a1 = 0.88605361, .b0 = 0.05697319, .b1 = 0.05697319};
 
   // setup robot
