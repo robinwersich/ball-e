@@ -87,7 +87,7 @@ int main() {
       Omniwheel(150, std::move(driver_2), MotorState{&decoder_2.state(), 6, 115, velocity_filter}),
       Omniwheel(270, std::move(driver_3), MotorState{&decoder_3.state(), 6, 115, velocity_filter})
     },
-    OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0}, 0.0,
+    OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0}, 0.0, 5.0,
     LowPassCoefficients{.a1 = 0.85956724, .b0 = 0.07021638, .b1 = 0.07021638}
   );
 

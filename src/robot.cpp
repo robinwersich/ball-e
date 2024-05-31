@@ -7,9 +7,10 @@
 
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-  float encoder_gain, LowPassCoefficients balance_filter
+  float encoder_gain, float max_rotation, LowPassCoefficients balance_filter
 )
-  : _wheels{std::move(wheels)}
+  : _speed_to_balance_factor{static_cast<float>(std::sin(max_rotation / 180 * M_PI))}
+  , _wheels{std::move(wheels)}
   , _orientation_estimator{std::move(orientation_estimator)}
   , _pid_x{-1, 1, pid_gains, balance_filter}
   , _pid_y{-1, 1, pid_gains, balance_filter}
@@ -68,9 +69,11 @@ void Robot::update() {
 void Robot::update_ground() { drive(_target_speed, _target_rotation); }
 
 void Robot::update_balancing() {
+  const auto target = compute_target_vector(_target_speed);
+
   // the down vector represents how much gravity affects each of the axes
   const auto down = -_orientation_estimator.up();
-  Eigen::Vector2f speed{_pid_x.compute(down.x()), _pid_y.compute(down.y())};
+  Eigen::Vector2f speed{_pid_x.compute(down.x(), target.x()), _pid_y.compute(down.y(), target.y())};
   const auto encoder_term = _encoder_gain * _measured_speed;
   speed += encoder_term;
 
@@ -119,4 +122,10 @@ void Robot::update_speed() {
   }
   avg_rotation /= wheel_speeds.size();
   _measured_rotation = avg_rotation;
+}
+
+Eigen::Vector2f Robot::compute_target_vector(Eigen::Vector2f target_speed) const {
+  auto speed_norm = target_speed.norm();
+  if (speed_norm > 1) target_speed /= speed_norm;
+  return target_speed * _speed_to_balance_factor;
 }

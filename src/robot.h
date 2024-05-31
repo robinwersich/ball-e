@@ -18,12 +18,13 @@ class Robot {
    *  Units are S/g, S/(g·s), and S/(g/s) for kp, ki, and kd respectively
    *  where S is the speed fraction of the robot and g is the gravity influence on each axis
    * @param encoder_gain The gain with which to add the current speed (rps) to the balance output.
+   * @param max_rotation The maximum rotation the robot can still recover from in degrees.
    * @param balance_filter An optional low-pass filter to apply to the orientation signal.
    * @note The robot will not start moving until `start_updating` is called.
    */
   Robot(
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-    float encoder_gain, LowPassCoefficients balance_filter = {}
+    float encoder_gain, float max_rotation, LowPassCoefficients balance_filter = {}
   );
   ~Robot();
 
@@ -72,6 +73,7 @@ class Robot {
   float& encoder_gain() { return _encoder_gain; }
 
  private:
+  float _speed_to_balance_factor;  // factor for converting speed vector to balance target vector
   std::array<Omniwheel, 3> _wheels;
   OrientationEstimator _orientation_estimator;
   PidController _pid_x, _pid_y;
@@ -90,6 +92,9 @@ class Robot {
   void update_ground();
   /** Updates the robots movement based goal of balancing and achieving the desired speed */
   void update_balancing();
+
+  /** Computes the target vector to feed to the PID controller based on a target speed. */
+  Eigen::Vector2f compute_target_vector(Eigen::Vector2f target_speed) const;
 
   /**
    * Directly makes the robot move in the given direction, speed and rotation.
