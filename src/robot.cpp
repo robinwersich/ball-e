@@ -7,14 +7,13 @@
 
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-  float encoder_gain, float max_rotation, LowPassCoefficients balance_filter
+  float max_rotation, LowPassCoefficients balance_filter
 )
   : _speed_to_balance_factor{static_cast<float>(std::sin(max_rotation / 180 * M_PI))}
   , _wheels{std::move(wheels)}
   , _orientation_estimator{std::move(orientation_estimator)}
   , _pid_x{-1, 1, pid_gains, balance_filter}
-  , _pid_y{-1, 1, pid_gains, balance_filter}
-  , _encoder_gain{encoder_gain} {
+  , _pid_y{-1, 1, pid_gains, balance_filter} {
   critical_section_init(&_cs);
 }
 
@@ -74,8 +73,6 @@ void Robot::update_balancing() {
   // the down vector represents how much gravity affects each of the axes
   const auto down = -_orientation_estimator.up();
   Eigen::Vector2f speed{_pid_x.compute(down.x(), target.x()), _pid_y.compute(down.y(), target.y())};
-  const auto encoder_term = _encoder_gain * _measured_speed;
-  speed += encoder_term;
 
   // because of physics™, the effect of the motor movement on the angle is proportional
   // to cos²(angle) = 1 - sin²(angle) = 1 - down²

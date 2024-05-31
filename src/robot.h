@@ -24,7 +24,7 @@ class Robot {
    */
   Robot(
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-    float encoder_gain, float max_rotation, LowPassCoefficients balance_filter = {}
+    float max_rotation, LowPassCoefficients balance_filter = {}
   );
   ~Robot();
 
