@@ -19,7 +19,7 @@ The main concepts in the project explored are:
 - 1 12V battery pack
 - parts for 3 omniwheels
   - 3 \* 16 small rubber coated wheels similar to [these](https://www.aliexpress.com/item/2054027643.html) (+ axis)
-  - 3 \* 3 M2x8 bolts + nuts
+  - 3 \* 3 M2x8  bolts (socket head cap or other non-countersunk) + nuts
 - control board
   - [ProtoBoard](https://www.dfrobot.com/product-660.html)
   - 6 10-33nF capacitors
@@ -27,14 +27,14 @@ The main concepts in the project explored are:
   - MF headers: 2x 20-pin, 2x 14-pin, 1x 5-pin, 3x 6-pin
   - MM headers: 2x 3-pin
   - 2 M2 threaded heat inserts
-  - 2 M2x3 bolts for securing the IMU
-  - 0.28mm² insulated wire (black, red, green, white)
-  - 0.75mm² insulated wire (black, red)
+  - 2 M2x3 bolts (socket head cap or other non-countersunk) for securing the IMU
+  - 0.28mm² insulated wire (20cm black, 25cm red, 50cm green, 40cm white)
+  - 0.75mm² insulated wire (5cm black, 5cm red)
 - battery connector: 9x5x5 barrel jack to 2x2 pin headers, 15cm length, 0.75mm²
-- 6 M3x25 and 3 M2.5x15 bolts + nuts for mounting the motors
+- 6 M3x25 (countersunk or low-profile non-countersunk) and 3 M2.5x15 bolts (socket head cap or other non-countersunk) + nuts for mounting the motors
 - 4 M30 FF PCB spacer
 - 4 M3 threaded heat inserts
-- 10 M3x6 bolts and 1 M3x10 headless bolt for mounting case, pcb and spacers
+- 10 M3x6 bolts and 1 M3x10 (socket head cap or other non-countersunk) headless bolt for mounting case, pcb and spacers
 - 2cm Velcro for attaching battery
 - metal case (150x150x90)
 - bluetooth gamepad
