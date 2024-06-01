@@ -6,12 +6,15 @@
 #include <ranges>
 
 SpeedConfig::SpeedConfig(
-  double ball_radius, double ground_wheel_radius, double ground_circle_radius, double ball_wheel_radius,
-  double ball_circle_radius
+  double ball_radius, double ground_wheel_radius, double ground_circle_radius,
+  double ball_wheel_radius, double ball_circle_radius
 )
   : ground_m_per_rev{static_cast<float>(2 * M_PI * ground_wheel_radius / 1000)}
   , ground_rad_per_rev{static_cast<float>(ground_circle_radius / ground_wheel_radius * 2 * M_PI)}
-  , balance_m_per_rev{static_cast<float>(ball_radius / std::sqrt(ball_radius * ball_radius - ball_circle_radius * ball_circle_radius) * 2 * M_PI * ball_wheel_radius / 1000)}
+  , balance_m_per_rev{static_cast<float>(
+      -ball_radius / std::sqrt(ball_radius * ball_radius - ball_circle_radius * ball_circle_radius)
+      * 2 * M_PI * ball_wheel_radius / 1000
+    )}
   , balance_rad_per_rev{static_cast<float>(ball_circle_radius / ball_wheel_radius * 2 * M_PI)} {}
 
 Robot::Robot(
@@ -129,19 +132,21 @@ void Robot::drive(Eigen::Vector2f speed, float rotation) {
 }
 
 void Robot::update_speed() {
-  std::array<Eigen::Vector2f, 3> wheel_speeds;
-  for (size_t i = 0; i < _wheels.size(); ++i) wheel_speeds[i] = _wheels[i].compute_speed();
+  std::array<float, 3> wheel_speeds;
+  for (size_t i = 0; i < _wheels.size(); ++i) { wheel_speeds[i] = _wheels[i].compute_speed(); }
 
   // the average wheel speed turns out to be half the total speed, regardless of additional rotation
   Eigen::Vector2f avg_speed = {0, 0};
-  for (const auto& speed : wheel_speeds) avg_speed += speed;
+  for (size_t i = 0; i < _wheels.size(); ++i) {
+    avg_speed += wheel_speeds[i] * _wheels[i].wheel_direction();
+  }
   avg_speed /= wheel_speeds.size();
   _measured_speed = avg_speed * 2;
 
   // rotation speed is the additional speed wheels have compared to just linear motion
   float avg_rotation = 0;
   for (size_t i = 0; i < _wheels.size(); ++i) {
-    avg_rotation += wheel_speeds[i].norm() - _wheels[i].get_local_speed(avg_speed);
+    avg_rotation += wheel_speeds[i] - _wheels[i].get_local_speed(avg_speed);
   }
   avg_rotation /= wheel_speeds.size();
   _measured_rotation = avg_rotation;

@@ -19,8 +19,12 @@ void Omniwheel::drive(float speed) const { _motor_driver->drive(speed); }
 
 void Omniwheel::stop() const { _motor_driver->stop(); }
 
-Eigen::Vector2f Omniwheel::compute_speed() {
-  return _motor_state.compute_speed_rps() * _wheel_direction;
+float Omniwheel::compute_speed() {
+  return _motor_state.compute_speed_rps();
+}
+
+const Eigen::Vector2f& Omniwheel::wheel_direction() const {
+  return _wheel_direction;
 }
 
 float Omniwheel::get_local_speed(const Eigen::Vector2f global_speed) const {

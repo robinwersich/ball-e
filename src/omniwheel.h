@@ -52,7 +52,10 @@ class Omniwheel {
   void stop() const;
 
   /** Computes the current speed vector in rev/s */
-  Eigen::Vector2f compute_speed();
+  float compute_speed();
+
+  /** Returns the direction of the main axis. */
+  const Eigen::Vector2f& wheel_direction() const;
 
   /** Computes the required speed along the main axis given a global speed vector. */
   float get_local_speed(const Eigen::Vector2f global_speed) const;
