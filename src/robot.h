@@ -8,6 +8,30 @@
 #include "pico/time.h"
 #include "pid.h"
 
+struct SpeedConfig {
+  /** How many meters one wheel rotation corresponds to on the ground. */
+  float ground_m_per_rev;
+  /** How many meters one wheel rotation corresponds to on the ball. */
+  float balance_m_per_rev;
+  /** How many radians of rotation one wheel rotation corresponds to on the ground. */
+  float ground_rad_per_rev;
+  /** How many radians of rotation one wheel rotation corresponds to on the ball. */
+  float balance_rad_per_rev;
+
+  /**
+   * Creates a speed configuration from various measurements (all in mm).
+   * @param ball_radius The radius of the ball.
+   * @param ground_wheel_radius The distance between the wheel axis and ground contact point.
+   * @param gound_circle_radius The distance between the wheel contact point and robot center.
+   * @param ball_wheel_radius The distance between the wheel axis and ball contact point.
+   * @param ball_circle_radius The distance between the ball contact point and robot center.
+   */
+  SpeedConfig(
+    double ball_radius, double ground_wheel_radius, double ground_circle_radius,
+    double ball_wheel_radius, double ball_circle_radius
+  );
+};
+
 class Robot {
  public:
   /**
@@ -19,14 +43,16 @@ class Robot {
    *  where S is the speed fraction of the robot and g is the gravity influence on each axis
    * @param encoder_gain The gain with which to add the current speed (rps) to the balance output.
    * @param max_rotation The maximum rotation the robot can still recover from in degrees.
+   * @param speed_config The configuration for converting wheel rotations to meters and radians.
    * @param orientation_filter An optional low-pass filter to apply to the orientation derivative.
    * @param balance_speed_filter An optional low-pass filter to apply to the speed when balancing.
    * @note The robot will not start moving until `start_updating` is called.
    */
   Robot(
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-    float max_rotation, LowPassCoefficients orientation_filter = {},
-    LowPassCoefficients balance_speed_filter = {}
+    float max_rotation, const SpeedConfig& speed_config,
+    const LowPassCoefficients& orientation_filter = {},
+    const LowPassCoefficients& balance_speed_filter = {}
   );
   ~Robot();
 
@@ -35,8 +61,9 @@ class Robot {
    * The length of the movement vector should be between 0 and 1.
    * @param x The rightward component of the movement vector.
    * @param y The forward component of the movement vector.
+   * @param is_global If the speed is given in global coordinates.
    */
-  void set_drive_speed(float x, float y);
+  void set_drive_speed(float x, float y, bool is_global = false);
 
   /**
    * Make the robot rotate around its center.
@@ -49,8 +76,9 @@ class Robot {
    * @param x The rightward component of the movement vector.
    * @param y The forward component of the movement vector.
    * @param speed The speed at which to rotate, between -1 (clockwise) and 1 (anti-clockwise).
+   * @param is_global If the speed is given in global coordinates.
    */
-  void set_speed(float x, float y, float rot);
+  void set_speed(float x, float y, float rot, bool is_global = false);
 
   /** Stops the robot. */
   void stop();
@@ -67,6 +95,11 @@ class Robot {
   /** Stops the timer interrupt for handling the robot movement. */
   void stop_updating();
 
+  /** Returns the current position estimate. */
+  Eigen::Vector2f& position() { return _current_position; }
+  /** Returns the current angle estimate. */
+  float& angle() { return _current_angle; }
+
   /** Returns the PID controller for the x-axis  */
   PidController& pid_x() { return _pid_x; }
   /** Returns the PID controller for the y-axis  */
@@ -80,15 +113,20 @@ class Robot {
   OrientationEstimator _orientation_estimator;
   PidController _pid_x, _pid_y;
   float _encoder_gain;
-  Eigen::Vector2f _target_speed = {0, 0};
+  Eigen::Vector2f _target_speed = {0, 0};  // fractional speed, local or global
+  bool _is_speed_global = false;
   LowPassFilter _balance_speed_filter_x;
   LowPassFilter _balance_speed_filter_y;
-  float _target_rotation = 0;
-  Eigen::Vector2f _measured_speed = {0, 0};
-  float _measured_rotation = 0;
+  float _target_rotation = 0;                  // fractional speed
+  Eigen::Vector2f _measured_speed = {0, 0};    // rps, local
+  float _measured_rotation = 0;                // rps
+  float _current_angle = 0;                    // radians
+  Eigen::Vector2f _current_position = {0, 0};  // meters, global
+  SpeedConfig _speed_config;
   bool _balancing_mode = false;
   repeating_timer_t _update_timer;
   critical_section_t _cs;
+  uint32_t _last_update_us = 0;
 
   /** Resets values that are updated while balancing */
   void reset_balancing();
@@ -115,4 +153,10 @@ class Robot {
 
   /** Updates measured speed and measured rotation speed based on encoder readings. */
   void update_speed();
+  /** Updates the current position and angle estimate. */
+  void update_pos_and_angle();
+
+  Eigen::Vector2f global_to_local_speed(Eigen::Vector2f global_speed) const;
+  Eigen::Vector2f local_to_global_speed(Eigen::Vector2f local_speed) const;
+  Eigen::Vector2f ensure_local(Eigen::Vector2f speed) const;
 };

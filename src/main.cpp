@@ -22,6 +22,11 @@ const uint ENC3_SLOT = 5;
 // -- IMU --
 const uint IMU_SLOT = 7;
 
+/** Fraction of the maximum possible speed which is allowed for ground movement. */
+const float MAX_SPEED = 0.8;
+/** Fraction of the maximum possible speed which is allowed for rotation. */
+const float MAX_ROTATION = 0.5;
+
 std::unique_ptr<Robot> robot;
 
 void on_gamepad_data(const uni_gamepad_t& gamepad) {
@@ -80,6 +85,11 @@ int main() {
   MotorDecoder decoder_3{ENC3_SLOT, true};
   LowPassCoefficients velocity_filter{.a1 = 0.88605361, .b0 = 0.05697319, .b1 = 0.05697319};
 
+  // setup speed config
+  SpeedConfig speed_config(
+    750 / M_PI / 2, 30.95, 57.46, 30.576, 54.277
+  );
+
   // setup robot
   robot = std::make_unique<Robot>(
     std::array<Omniwheel, 3>{
@@ -87,7 +97,7 @@ int main() {
       Omniwheel(150, std::move(driver_2), MotorState{&decoder_2.state(), 6, 115, velocity_filter}),
       Omniwheel(270, std::move(driver_3), MotorState{&decoder_3.state(), 6, 115, velocity_filter})
     },
-    OrientationEstimator{imu}, PidGains{15.0, 500.0, 0.0}, 2.5,
+    OrientationEstimator{imu}, PidGains{15.0, 500.0, 0.0}, 2.5, speed_config,
     LowPassCoefficients{.a1 = 0.85956724, .b0 = 0.07021638, .b1 = 0.07021638},
     LowPassCoefficients{.a1 = 0.97024184, .b0 = 0.01487908, .b1 = 0.01487908}
   );

@@ -5,10 +5,19 @@
 #include <numeric>
 #include <ranges>
 
+SpeedConfig::SpeedConfig(
+  double ball_radius, double ground_wheel_radius, double ground_circle_radius, double ball_wheel_radius,
+  double ball_circle_radius
+)
+  : ground_m_per_rev{static_cast<float>(2 * M_PI * ground_wheel_radius / 1000)}
+  , ground_rad_per_rev{static_cast<float>(ground_circle_radius / ground_wheel_radius * 2 * M_PI)}
+  , balance_m_per_rev{static_cast<float>(ball_radius / std::sqrt(ball_radius * ball_radius - ball_circle_radius * ball_circle_radius) * 2 * M_PI * ball_wheel_radius / 1000)}
+  , balance_rad_per_rev{static_cast<float>(ball_circle_radius / ball_wheel_radius * 2 * M_PI)} {}
+
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-  float max_rotation, LowPassCoefficients orientation_filter,
-  LowPassCoefficients balance_speed_filter
+  float max_rotation, const SpeedConfig& speed_config,
+  const LowPassCoefficients& orientation_filter, const LowPassCoefficients& balance_speed_filter
 )
   : _speed_to_balance_factor{static_cast<float>(std::sin(max_rotation / 180 * M_PI))}
   , _wheels{std::move(wheels)}
@@ -16,7 +25,8 @@ Robot::Robot(
   , _pid_x{-1, 1, pid_gains, orientation_filter}
   , _pid_y{-1, 1, pid_gains, orientation_filter}
   , _balance_speed_filter_x{balance_speed_filter}
-  , _balance_speed_filter_y{balance_speed_filter} {
+  , _balance_speed_filter_y{balance_speed_filter}
+  , _speed_config{speed_config} {
   critical_section_init(&_cs);
 }
 
@@ -25,16 +35,18 @@ Robot::~Robot() {
   critical_section_deinit(&_cs);
 }
 
-void Robot::set_speed(float x, float y, float rot) {
+void Robot::set_speed(float x, float y, float rot, bool is_global) {
   critical_section_enter_blocking(&_cs);
   _target_speed = {x, y};
   _target_rotation = rot;
+  _is_speed_global = is_global;
   critical_section_exit(&_cs);
 }
 
-void Robot::set_drive_speed(float x, float y) {
+void Robot::set_drive_speed(float x, float y, bool is_global) {
   critical_section_enter_blocking(&_cs);
   _target_speed = {x, y};
+  _is_speed_global = is_global;
   critical_section_exit(&_cs);
 }
 
@@ -50,6 +62,7 @@ void Robot::stop() {
 }
 
 void Robot::start_updating() {
+  _last_update_us = time_us_32();
   add_repeating_timer_us(
     _orientation_estimator.update_period_us(),
     [](repeating_timer_t* rt) {
@@ -65,17 +78,18 @@ void Robot::stop_updating() { cancel_repeating_timer(&_update_timer); }
 void Robot::update() {
   _orientation_estimator.update(true);
   update_speed();
+  update_pos_and_angle();
   _balancing_mode ? update_balancing() : update_ground();
 }
 
-void Robot::update_ground() { drive(_target_speed, _target_rotation); }
+void Robot::update_ground() { drive(ensure_local(_target_speed), _target_rotation); }
 
 void Robot::update_balancing() {
   const Eigen::Vector2f filtered_target_speed{
     _balance_speed_filter_x.filter(_target_speed.x()),
     _balance_speed_filter_y.filter(_target_speed.y())
   };
-  const auto target = compute_target_vector(filtered_target_speed);
+  const auto target = compute_target_vector(ensure_local(filtered_target_speed));
 
   // the down vector represents how much gravity affects each of the axes
   const auto down = -_orientation_estimator.up();
@@ -89,9 +103,8 @@ void Robot::update_balancing() {
 }
 
 void Robot::set_balancing(bool enabled) {
-  if (_balancing_mode == false and enabled == true) {
-    reset_balancing();
-  }
+  if (_balancing_mode == false and enabled == true) reset_balancing();
+
   _balancing_mode = enabled;
 }
 
@@ -134,8 +147,34 @@ void Robot::update_speed() {
   _measured_rotation = avg_rotation;
 }
 
+void Robot::update_pos_and_angle() {
+  const auto now = time_us_32();
+  const auto dt = now - _last_update_us;
+  _last_update_us = now;
+
+  const auto rev_to_m =
+    _balancing_mode ? _speed_config.balance_m_per_rev : _speed_config.ground_m_per_rev;
+  const auto rev_to_rad =
+    _balancing_mode ? _speed_config.balance_rad_per_rev : _speed_config.ground_rad_per_rev;
+
+  _current_position += local_to_global_speed(_measured_speed) * rev_to_m * (dt / 1e6f);
+  _current_angle += _measured_rotation * rev_to_rad * (dt / 1e6f);
+}
+
 Eigen::Vector2f Robot::compute_target_vector(Eigen::Vector2f target_speed) const {
   auto speed_norm = target_speed.norm();
   if (speed_norm > 1) target_speed /= speed_norm;
   return target_speed * _speed_to_balance_factor;
+}
+
+Eigen::Vector2f Robot::global_to_local_speed(Eigen::Vector2f global_speed) const {
+  return Eigen::Rotation2Df{-_current_angle} * global_speed;
+}
+
+Eigen::Vector2f Robot::local_to_global_speed(Eigen::Vector2f local_speed) const {
+  return Eigen::Rotation2Df{_current_angle} * local_speed;
+}
+
+Eigen::Vector2f Robot::ensure_local(Eigen::Vector2f speed) const {
+  return _is_speed_global ? global_to_local_speed(speed) : speed;
 }
