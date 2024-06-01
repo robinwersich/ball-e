@@ -1,7 +1,5 @@
-add_library(filter STATIC
-  ./src/lowpass.cpp
-)
+add_library(filter INTERFACE)
 
-target_include_directories(filter PUBLIC
+target_include_directories(filter INTERFACE
   ./include
 )

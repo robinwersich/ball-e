@@ -37,5 +37,5 @@ class MotorState {
   uint32_t _last_count_micros = 0;
   float _last_count = 0;
   float _revolutions_per_tick;  // shaft revolutions
-  LowPassFilter _speed_filter;
+  LowPassFilter<float> _speed_filter;
 };

@@ -78,7 +78,7 @@ class PidController {
   float _last_error = 0;
   float _target = 0.0;
   uint32_t _last_time_millis = 0;  // 0 means uninitialized
-  LowPassFilter _filter;
+  LowPassFilter<float> _filter;
 
   bool is_initialized() const;
 

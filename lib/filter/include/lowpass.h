@@ -15,25 +15,36 @@ struct LowPassCoefficients {
 };
 
 /** This implements a simple first order low pass filter. */
-class LowPassFilter {
+template <typename T = float> class LowPassFilter {
  public:
   /** Creates a lowpass filter with */
-  LowPassFilter(const LowPassCoefficients& coefficients);
+  LowPassFilter(const LowPassCoefficients& coefficients) : _coeff{coefficients} {}
 
   /**
    * Returns the filtered output of the signal.
    * @note This must be called at the sampling frequency used to calculate the coefficients.
    */
-  float filter(float signal);
+  T filter(T signal) {
+    T output = _coeff.a1 * _prev_output + _coeff.b0 * signal + _coeff.b1 * _prev_signal;
+    _prev_signal = signal;
+    _prev_output = output;
+    return output;
+  }
 
   /** Returns the derivative of the filtered input signal. */
-  float filtered_derivative(float signal, float dt);
+  template <typename TTime> T filtered_derivative(T signal, TTime dt) {
+    const auto prev_output = _prev_output;
+    return (filter(signal) - prev_output) / dt;
+  }
 
   /** Resets the internal state of the filter. */
-  void reset();
+  void reset() {
+    _prev_signal = {};
+    _prev_output = {};
+  }
 
  private:
   LowPassCoefficients _coeff;
-  float _prev_signal = 0;
-  float _prev_output = 0;
+  T _prev_signal = {};
+  T _prev_output = {};
 };
