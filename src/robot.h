@@ -84,7 +84,8 @@ class Robot {
   PidController _pid_x, _pid_y;
   float _encoder_gain;
   Eigen::Vector2f _target_speed = {0, 0};
-  LowPassFilter<Eigen::Vector2f> _balance_speed_filter;
+  LowPassFilter _balance_speed_filter_x;
+  LowPassFilter _balance_speed_filter_y;
   float _target_rotation = 0;
   Eigen::Vector2f _measured_speed = {0, 0};
   float _measured_rotation = 0;

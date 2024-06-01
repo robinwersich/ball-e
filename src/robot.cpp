@@ -16,7 +16,8 @@ Robot::Robot(
   , _auto_calibration_speed{auto_calibration_speed}
   , _pid_x{-1, 1, pid_gains, orientation_filter}
   , _pid_y{-1, 1, pid_gains, orientation_filter}
-  , _balance_speed_filter{balance_speed_filter} {
+  , _balance_speed_filter_x{balance_speed_filter}
+  , _balance_speed_filter_y{balance_speed_filter} {
   critical_section_init(&_cs);
 }
 
@@ -82,7 +83,11 @@ void Robot::update_balancing() {
                 + offset_rotation * _local_down * _auto_calibration_speed;
   }
 
-  const auto target = compute_target_vector(_balance_speed_filter.filter(_target_speed));
+  const Eigen::Vector2f filtered_target_speed{
+    _balance_speed_filter_x.filter(_target_speed.x()),
+    _balance_speed_filter_y.filter(_target_speed.y())
+  };
+  const auto target = compute_target_vector(filtered_target_speed);
   Eigen::Vector2f speed{_pid_x.compute(down.x(), target.x()), _pid_y.compute(down.y(), target.y())};
 
   // because of physics™, the effect of the motor movement on the angle is proportional
@@ -100,7 +105,8 @@ void Robot::set_balancing(bool enabled) {
 void Robot::reset_balancing() {
   _pid_x.reset();
   _pid_y.reset();
-  _balance_speed_filter.reset();
+  _balance_speed_filter_x.reset();
+  _balance_speed_filter_y.reset();
   _local_down = {0, 0, -1};
 }
 
