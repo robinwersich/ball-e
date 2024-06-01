@@ -19,12 +19,14 @@ class Robot {
    *  where S is the speed fraction of the robot and g is the gravity influence on each axis
    * @param encoder_gain The gain with which to add the current speed (rps) to the balance output.
    * @param max_rotation The maximum rotation the robot can still recover from in degrees.
-   * @param balance_filter An optional low-pass filter to apply to the orientation signal.
+   * @param orientation_filter An optional low-pass filter to apply to the orientation derivative.
+   * @param balance_speed_filter An optional low-pass filter to apply to the speed when balancing.
    * @note The robot will not start moving until `start_updating` is called.
    */
   Robot(
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-    float max_rotation, LowPassCoefficients balance_filter = {}
+    float max_rotation, LowPassCoefficients orientation_filter = {},
+    LowPassCoefficients balance_speed_filter = {}
   );
   ~Robot();
 
@@ -79,6 +81,7 @@ class Robot {
   PidController _pid_x, _pid_y;
   float _encoder_gain;
   Eigen::Vector2f _target_speed = {0, 0};
+  LowPassFilter<Eigen::Vector2f> _balance_speed_filter;
   float _target_rotation = 0;
   Eigen::Vector2f _measured_speed = {0, 0};
   float _measured_rotation = 0;

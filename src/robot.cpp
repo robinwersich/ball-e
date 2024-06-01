@@ -7,13 +7,15 @@
 
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-  float max_rotation, LowPassCoefficients balance_filter
+  float max_rotation, LowPassCoefficients orientation_filter,
+  LowPassCoefficients balance_speed_filter
 )
   : _speed_to_balance_factor{static_cast<float>(std::sin(max_rotation / 180 * M_PI))}
   , _wheels{std::move(wheels)}
   , _orientation_estimator{std::move(orientation_estimator)}
-  , _pid_x{-1, 1, pid_gains, balance_filter}
-  , _pid_y{-1, 1, pid_gains, balance_filter} {
+  , _pid_x{-1, 1, pid_gains, orientation_filter}
+  , _pid_y{-1, 1, pid_gains, orientation_filter}
+  , _balance_speed_filter{balance_speed_filter} {
   critical_section_init(&_cs);
 }
 
@@ -68,7 +70,7 @@ void Robot::update() {
 void Robot::update_ground() { drive(_target_speed, _target_rotation); }
 
 void Robot::update_balancing() {
-  const auto target = compute_target_vector(_target_speed);
+  const auto target = compute_target_vector(_balance_speed_filter.filter(_target_speed));
 
   // the down vector represents how much gravity affects each of the axes
   const auto down = -_orientation_estimator.up();
@@ -85,6 +87,7 @@ void Robot::set_balancing(bool enabled) {
   if (_balancing_mode == false and enabled == true) {
     _pid_x.reset();
     _pid_y.reset();
+    _balance_speed_filter.reset();
   }
   _balancing_mode = enabled;
 }

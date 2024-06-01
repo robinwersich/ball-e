@@ -87,8 +87,9 @@ int main() {
       Omniwheel(150, std::move(driver_2), MotorState{&decoder_2.state(), 6, 115, velocity_filter}),
       Omniwheel(270, std::move(driver_3), MotorState{&decoder_3.state(), 6, 115, velocity_filter})
     },
-    OrientationEstimator{imu}, PidGains{0.0, 0.0, 0.0}, 5.0,
-    LowPassCoefficients{.a1 = 0.85956724, .b0 = 0.07021638, .b1 = 0.07021638}
+    OrientationEstimator{imu}, PidGains{15.0, 500.0, 0.0}, 2.5,
+    LowPassCoefficients{.a1 = 0.85956724, .b0 = 0.07021638, .b1 = 0.07021638},
+    LowPassCoefficients{.a1 = 0.97024184, .b0 = 0.01487908, .b1 = 0.01487908}
   );
 
   btcontrol::init();
