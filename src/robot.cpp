@@ -7,12 +7,13 @@
 
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-  float max_rotation, LowPassCoefficients orientation_filter,
+  float max_rotation, float auto_calibration_speed, LowPassCoefficients orientation_filter,
   LowPassCoefficients balance_speed_filter
 )
-  : _speed_to_balance_factor{static_cast<float>(std::sin(max_rotation / 180 * M_PI))}
+  : _max_angle_sin{static_cast<float>(std::sin(max_rotation / 180 * M_PI))}
   , _wheels{std::move(wheels)}
   , _orientation_estimator{std::move(orientation_estimator)}
+  , _auto_calibration_speed{auto_calibration_speed}
   , _pid_x{-1, 1, pid_gains, orientation_filter}
   , _pid_y{-1, 1, pid_gains, orientation_filter}
   , _balance_speed_filter{balance_speed_filter} {
@@ -70,10 +71,18 @@ void Robot::update() {
 void Robot::update_ground() { drive(_target_speed, _target_rotation); }
 
 void Robot::update_balancing() {
-  const auto target = compute_target_vector(_balance_speed_filter.filter(_target_speed));
-
   // the down vector represents how much gravity affects each of the axes
   const auto down = -_orientation_estimator.up();
+
+  // only auto calibrate if robot is currently not trying to move
+  if (_target_speed == Eigen::Vector2f{0, 0}) {
+    const auto offset_rotation = Eigen::Quaternionf::FromTwoVectors(down, _local_down);
+    // nudge the local down vector in the direction opposite vector of the current down vector
+    _local_down = _local_down * (1 - _auto_calibration_speed)
+                + offset_rotation * _local_down * _auto_calibration_speed;
+  }
+
+  const auto target = compute_target_vector(_balance_speed_filter.filter(_target_speed));
   Eigen::Vector2f speed{_pid_x.compute(down.x(), target.x()), _pid_y.compute(down.y(), target.y())};
 
   // because of physics™, the effect of the motor movement on the angle is proportional
@@ -84,12 +93,15 @@ void Robot::update_balancing() {
 }
 
 void Robot::set_balancing(bool enabled) {
-  if (_balancing_mode == false and enabled == true) {
-    _pid_x.reset();
-    _pid_y.reset();
-    _balance_speed_filter.reset();
-  }
+  if (_balancing_mode == false and enabled == true) reset_balancing();
   _balancing_mode = enabled;
+}
+
+void Robot::reset_balancing() {
+  _pid_x.reset();
+  _pid_y.reset();
+  _balance_speed_filter.reset();
+  _local_down = {0, 0, -1};
 }
 
 void Robot::drive(Eigen::Vector2f speed, float rotation) {
@@ -124,8 +136,16 @@ void Robot::update_speed() {
   _measured_rotation = avg_rotation;
 }
 
-Eigen::Vector2f Robot::compute_target_vector(Eigen::Vector2f target_speed) const {
-  auto speed_norm = target_speed.norm();
+Eigen::Vector3f Robot::compute_target_vector(Eigen::Vector2f target_speed) const {
+  const Eigen::Vector3f global_down{0, 0, -1};
+  // we want to apply speed based tilt in global space, but then need to convert to local space
+  const auto global_to_local = Eigen::Quaternionf::FromTwoVectors(global_down, _local_down);
+
+  const auto speed_norm = target_speed.norm();
   if (speed_norm > 1) target_speed /= speed_norm;
-  return target_speed * _speed_to_balance_factor;
+  const auto target_2d = target_speed * _max_angle_sin;
+  const Eigen::Vector3f target_3d{
+    target_2d.x(), target_2d.y(), -std::sqrt(1 - target_2d.squaredNorm())
+  };
+  return (global_to_local * target_3d);
 }
