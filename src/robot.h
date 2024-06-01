@@ -19,15 +19,14 @@ class Robot {
    *  where S is the speed fraction of the robot and g is the gravity influence on each axis
    * @param encoder_gain The gain with which to add the current speed (rps) to the balance output.
    * @param max_rotation The maximum rotation the robot can still recover from in degrees.
-   * @param auto_calibration_speed The speed at which the local down vector is adjusted.
    * @param orientation_filter An optional low-pass filter to apply to the orientation derivative.
    * @param balance_speed_filter An optional low-pass filter to apply to the speed when balancing.
    * @note The robot will not start moving until `start_updating` is called.
    */
   Robot(
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-    float max_rotation, float auto_calibration_speed = 0,
-    LowPassCoefficients orientation_filter = {}, LowPassCoefficients balance_speed_filter = {}
+    float max_rotation, LowPassCoefficients orientation_filter = {},
+    LowPassCoefficients balance_speed_filter = {}
   );
   ~Robot();
 
@@ -76,11 +75,9 @@ class Robot {
   float& encoder_gain() { return _encoder_gain; }
 
  private:
-  float _max_angle_sin;  // factor for converting speed vector to balance target vector
+  float _speed_to_balance_factor;  // factor for converting speed vector to balance target vector
   std::array<Omniwheel, 3> _wheels;
   OrientationEstimator _orientation_estimator;
-  Eigen::Vector3f _local_down = {0, 0, -1};  // may be offset because of IMU tilt or asymmetry
-  float _auto_calibration_speed;
   PidController _pid_x, _pid_y;
   float _encoder_gain;
   Eigen::Vector2f _target_speed = {0, 0};
@@ -104,7 +101,7 @@ class Robot {
   void update_balancing();
 
   /** Computes the target vector to feed to the PID controller based on a target speed. */
-  Eigen::Vector3f compute_target_vector(Eigen::Vector2f target_speed) const;
+  Eigen::Vector2f compute_target_vector(Eigen::Vector2f target_speed) const;
 
   /**
    * Directly makes the robot move in the given direction, speed and rotation.
