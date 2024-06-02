@@ -5,6 +5,7 @@
 #include "pico/critical_section.h"
 #include "pico/stdlib.h"
 #include "robot.h"
+#include "robot_control.h"
 
 const uint PWM_FREQUENCY = 25000;
 // -- motor 1 --
@@ -22,28 +23,8 @@ const uint ENC3_SLOT = 5;
 // -- IMU --
 const uint IMU_SLOT = 7;
 
-/** Fraction of the maximum possible speed which is allowed for ground movement. */
-const float MAX_SPEED = 0.8;
-/** Fraction of the maximum possible speed which is allowed for rotation. */
-const float MAX_ROTATION = 0.5;
-
 std::unique_ptr<Robot> robot;
-
-void on_gamepad_data(const uni_gamepad_t& gamepad) {
-  static bool balance_pressed = false;
-
-  if (gamepad.buttons & BUTTON_B and !balance_pressed) {
-    robot->toggle_balancing();
-    printf("Balancing mode %s\n", robot->is_balancing() ? "enabled" : "disabled");
-  }
-  balance_pressed = gamepad.buttons & BUTTON_B;
-
-  const float speed_x = gamepad.axis_x / 512.0;
-  const float speed_y = gamepad.axis_y / 512.0;
-  const float speed_rot = (gamepad.throttle - gamepad.brake) / 1024.0;
-
-  robot->set_speed(speed_x, speed_y, -speed_rot);  // should spin clockwise when throttle is pressed
-}
+RobotController controller{robot.get()};
 
 int main() {
   stdio_init_all();
@@ -101,11 +82,9 @@ int main() {
     LowPassCoefficients{.a1 = 0.97024184, .b0 = 0.01487908, .b1 = 0.01487908}
   );
 
-  btcontrol::init();
-  btcontrol::register_gampad_behavior(on_gamepad_data);
-
+  RobotController::initialize_controller(&controller);
   robot->start_updating();
-  btcontrol::run_loop();
+  controller.start_loop();
 
   return 0;
 }

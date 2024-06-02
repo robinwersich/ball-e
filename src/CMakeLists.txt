@@ -3,6 +3,7 @@ add_subdirectory(playground)
 add_executable(robot_firmware
     main.cpp
     robot.cpp
+    robot_control.cpp
     omniwheel.cpp
     motor_driver_kickstart.cpp
 )
