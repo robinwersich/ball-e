@@ -7,7 +7,7 @@
 
 SpeedConfig::SpeedConfig(
   double ball_radius, double ground_wheel_radius, double ground_circle_radius,
-  double ball_wheel_radius, double ball_circle_radius
+  double ball_wheel_radius, double ball_circle_radius, uint32_t update_period_ms
 )
   : ground_m_per_rev{static_cast<float>(2 * M_PI * ground_wheel_radius / 1000)}
   , ground_rad_per_rev{static_cast<float>(ground_circle_radius / ground_wheel_radius * 2 * M_PI)}
@@ -15,7 +15,8 @@ SpeedConfig::SpeedConfig(
       -ball_radius / std::sqrt(ball_radius * ball_radius - ball_circle_radius * ball_circle_radius)
       * 2 * M_PI * ball_wheel_radius / 1000
     )}
-  , balance_rad_per_rev{static_cast<float>(ball_circle_radius / ball_wheel_radius * 2 * M_PI)} {}
+  , balance_rad_per_rev{static_cast<float>(ball_circle_radius / ball_wheel_radius * 2 * M_PI)}
+  , update_period_ms{update_period_ms} {}
 
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
@@ -66,21 +67,28 @@ void Robot::stop() {
 
 void Robot::start_updating() {
   _last_update_us = time_us_32();
+  add_repeating_timer_ms(
+    _speed_config.update_period_ms,
+    [](repeating_timer_t* rt) {
+      static_cast<Robot*>(rt->user_data)->update_speed();
+      return true;
+    },
+    this, &_speed_update_timer
+  );
   add_repeating_timer_us(
     _orientation_estimator.update_period_us(),
     [](repeating_timer_t* rt) {
       static_cast<Robot*>(rt->user_data)->update();
       return true;
     },
-    this, &_update_timer
+    this, &_balance_update_timer
   );
 }
 
-void Robot::stop_updating() { cancel_repeating_timer(&_update_timer); }
+void Robot::stop_updating() { cancel_repeating_timer(&_balance_update_timer); }
 
 void Robot::update() {
   _orientation_estimator.update(true);
-  update_speed();
   update_pos_and_angle();
   _balancing_mode ? update_balancing() : update_ground();
 }

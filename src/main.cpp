@@ -83,19 +83,18 @@ int main() {
   MotorDecoder decoder_1{ENC1_SLOT, true};
   MotorDecoder decoder_2{ENC2_SLOT};
   MotorDecoder decoder_3{ENC3_SLOT, true};
-  LowPassCoefficients velocity_filter{.a1 = 0.88605361, .b0 = 0.05697319, .b1 = 0.05697319};
 
   // setup speed config
   SpeedConfig speed_config(
-    750 / M_PI / 2, 30.95, 57.46, 30.576, 54.277
+    750 / M_PI / 2, 30.95, 57.46, 30.576, 54.277, 100
   );
 
   // setup robot
   robot = std::make_unique<Robot>(
     std::array<Omniwheel, 3>{
-      Omniwheel(30, std::move(driver_1), MotorState{&decoder_1.state(), 6, 115, velocity_filter}),
-      Omniwheel(150, std::move(driver_2), MotorState{&decoder_2.state(), 6, 115, velocity_filter}),
-      Omniwheel(270, std::move(driver_3), MotorState{&decoder_3.state(), 6, 115, velocity_filter})
+      Omniwheel(30, std::move(driver_1), MotorState{&decoder_1.state(), 6, 115}),
+      Omniwheel(150, std::move(driver_2), MotorState{&decoder_2.state(), 6, 115}),
+      Omniwheel(270, std::move(driver_3), MotorState{&decoder_3.state(), 6, 115})
     },
     OrientationEstimator{imu}, PidGains{15.0, 500.0, 0.0}, 2.5, speed_config,
     LowPassCoefficients{.a1 = 0.85956724, .b0 = 0.07021638, .b1 = 0.07021638},

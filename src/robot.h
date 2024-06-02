@@ -17,6 +17,8 @@ struct SpeedConfig {
   float ground_rad_per_rev;
   /** How many radians of rotation one wheel rotation corresponds to on the ball. */
   float balance_rad_per_rev;
+  /** How long the distance between speed measurement updates should be. */
+  uint32_t update_period_ms;
 
   /**
    * Creates a speed configuration from various measurements (all in mm).
@@ -28,7 +30,7 @@ struct SpeedConfig {
    */
   SpeedConfig(
     double ball_radius, double ground_wheel_radius, double ground_circle_radius,
-    double ball_wheel_radius, double ball_circle_radius
+    double ball_wheel_radius, double ball_circle_radius, uint32_t update_period_ms
   );
 };
 
@@ -124,7 +126,8 @@ class Robot {
   Eigen::Vector2f _current_position = {0, 0};  // meters, global
   SpeedConfig _speed_config;
   bool _balancing_mode = false;
-  repeating_timer_t _update_timer;
+  repeating_timer_t _balance_update_timer;
+  repeating_timer_t _speed_update_timer;
   critical_section_t _cs;
   uint32_t _last_update_us = 0;
 
