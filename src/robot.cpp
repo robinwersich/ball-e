@@ -10,12 +10,12 @@ SpeedConfig::SpeedConfig(
   double ball_wheel_radius, double ball_circle_radius, uint32_t update_period_ms
 )
   : ground_m_per_rev{static_cast<float>(2 * M_PI * ground_wheel_radius / 1000)}
-  , ground_rad_per_rev{static_cast<float>(ground_circle_radius / ground_wheel_radius * 2 * M_PI)}
+  , ground_rad_per_rev{static_cast<float>(ground_wheel_radius / ground_circle_radius * 2 * M_PI)}
   , balance_m_per_rev{static_cast<float>(
       -ball_radius / std::sqrt(ball_radius * ball_radius - ball_circle_radius * ball_circle_radius)
       * 2 * M_PI * ball_wheel_radius / 1000
     )}
-  , balance_rad_per_rev{static_cast<float>(ball_circle_radius / ball_wheel_radius * 2 * M_PI)}
+  , balance_rad_per_rev{static_cast<float>(ball_wheel_radius / ball_circle_radius * 2 * M_PI)}
   , update_period_ms{update_period_ms} {}
 
 Robot::Robot(
