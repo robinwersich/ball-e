@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <limits>
 
 #include "omniwheel.h"
 #include "orientation_estimator.h"
@@ -97,10 +98,12 @@ class Robot {
   /** Stops the timer interrupt for handling the robot movement. */
   void stop_updating();
 
-  /** Returns the current position estimate. */
+  /** Returns the current position estimate in meters. */
   Eigen::Vector2f& position() { return _current_position; }
   /** Returns the current angle estimate. */
   float& angle() { return _current_angle; }
+  /** Sets the maximum distance the robot is allowed to move from the global origin in meters. */
+  void set_max_distance(float max_distance) { _squared_max_distance = max_distance * max_distance; }
 
   /** Returns the PID controller for the x-axis  */
   PidController& pid_x() { return _pid_x; }
@@ -118,6 +121,7 @@ class Robot {
   LowPassFilter _balance_speed_filter_x;
   LowPassFilter _balance_speed_filter_y;
   bool _is_speed_global = false;
+  float _squared_max_distance = std::numeric_limits<float>::infinity();
   Eigen::Vector2f _target_speed = {0, 0};      // fractional speed, local or global
   float _target_rotation = 0;                  // fractional speed
   bool _is_translating = false;                // whether there currently is a translation signal
@@ -163,5 +167,8 @@ class Robot {
 
   Eigen::Vector2f global_to_local_speed(Eigen::Vector2f global_speed) const;
   Eigen::Vector2f local_to_global_speed(Eigen::Vector2f local_speed) const;
-  Eigen::Vector2f ensure_local(Eigen::Vector2f speed) const;
+  /** Returns the local target speed, taking the position limit into account. */
+  Eigen::Vector2f bounded_local_target_speed() const;
+  /** Returns the global target speed, taking the position limit into account. */
+  Eigen::Vector2f bounded_global_target_speed() const;
 };

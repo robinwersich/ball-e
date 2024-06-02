@@ -93,14 +93,16 @@ void Robot::update() {
   _balancing_mode ? update_balancing() : update_ground();
 }
 
-void Robot::update_ground() { drive(ensure_local(_target_speed), _target_rotation); }
+void Robot::update_ground() { drive(bounded_local_target_speed(), _target_rotation); }
 
 void Robot::update_balancing() {
+  const auto global_speed = bounded_global_target_speed();
+  // filter in global space to avoid delay when rotating while driving
   const Eigen::Vector2f filtered_target_speed{
-    _balance_speed_filter_x.filter(_target_speed.x()),
-    _balance_speed_filter_y.filter(_target_speed.y())
+    _balance_speed_filter_x.filter(global_speed.x()),
+    _balance_speed_filter_y.filter(global_speed.y())
   };
-  const auto target = compute_target_vector(ensure_local(filtered_target_speed));
+  const auto target = compute_target_vector(global_to_local_speed(filtered_target_speed));
 
   // the down vector represents how much gravity affects each of the axes
   const auto down = -_orientation_estimator.up();
@@ -195,6 +197,18 @@ Eigen::Vector2f Robot::local_to_global_speed(Eigen::Vector2f local_speed) const 
   return Eigen::Rotation2Df{_current_angle} * local_speed;
 }
 
-Eigen::Vector2f Robot::ensure_local(Eigen::Vector2f speed) const {
-  return _is_speed_global ? global_to_local_speed(speed) : speed;
+Eigen::Vector2f Robot::bounded_local_target_speed() const {
+  return global_to_local_speed(bounded_global_target_speed());
+}
+
+Eigen::Vector2f Robot::bounded_global_target_speed() const {
+  const auto global_speed = _is_speed_global ? _target_speed : local_to_global_speed(_target_speed);
+  if (std::isinf(_squared_max_distance)) return global_speed;
+  if (_current_position.squaredNorm() < _squared_max_distance) return global_speed;
+
+  const auto outward_direction = _current_position.normalized();
+  const auto outward_speed = outward_direction.dot(global_speed);
+  if (outward_speed <= 0) return global_speed;
+
+  return global_speed - outward_speed * outward_direction;
 }
