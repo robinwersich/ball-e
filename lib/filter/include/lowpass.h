@@ -32,6 +32,9 @@ class LowPassFilter {
   /** Resets the internal state of the filter. */
   void reset();
 
+  /** True, if the filters does not have any effect. */
+  bool is_passthrough() const;
+
  private:
   LowPassCoefficients _coeff;
   float _prev_signal = 0;

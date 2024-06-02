@@ -18,3 +18,7 @@ void LowPassFilter::reset() {
   _prev_signal = 0;
   _prev_output = 0;
 }
+
+bool LowPassFilter::is_passthrough() const {
+  return _coeff.a1 == 0 && _coeff.b0 == 1 && _coeff.b1 == 0;
+}

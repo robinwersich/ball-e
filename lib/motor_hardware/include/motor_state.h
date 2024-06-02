@@ -35,7 +35,10 @@ class MotorState {
  private:
   const MotorDecoderState* _decoder_state;
   uint32_t _last_count_micros = 0;
-  float _last_count = 0;
+  int32_t _last_count = 0;
   float _revolutions_per_tick;  // shaft revolutions
   LowPassFilter _speed_filter;
+
+  float compute_speed_tps_unfiltered();
+  float compute_speed_tps_filtered();
 };
