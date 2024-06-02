@@ -115,11 +115,13 @@ class Robot {
   OrientationEstimator _orientation_estimator;
   PidController _pid_x, _pid_y;
   float _encoder_gain;
-  Eigen::Vector2f _target_speed = {0, 0};  // fractional speed, local or global
-  bool _is_speed_global = false;
   LowPassFilter _balance_speed_filter_x;
   LowPassFilter _balance_speed_filter_y;
+  bool _is_speed_global = false;
+  Eigen::Vector2f _target_speed = {0, 0};      // fractional speed, local or global
   float _target_rotation = 0;                  // fractional speed
+  bool _is_translating = false;                // whether there currently is a translation signal
+  bool _is_rotating = false;                   // whether there currently is a rotation signal
   Eigen::Vector2f _measured_speed = {0, 0};    // rps, local
   float _measured_rotation = 0;                // rps
   float _current_angle = 0;                    // radians
