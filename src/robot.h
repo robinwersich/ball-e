@@ -45,7 +45,7 @@ class Robot {
    *  Units are S/g, S/(g·s), and S/(g/s) for kp, ki, and kd respectively
    *  where S is the speed fraction of the robot and g is the gravity influence on each axis
    * @param encoder_gain The gain with which to add the current speed (rps) to the balance output.
-   * @param max_rotation The maximum rotation the robot can still recover from in degrees.
+   * @param max_tilt The maximum tilt the robot can still recover from in degrees.
    * @param speed_config The configuration for converting wheel rotations to meters and radians.
    * @param orientation_filter An optional low-pass filter to apply to the orientation derivative.
    * @param balance_speed_filter An optional low-pass filter to apply to the speed when balancing.
@@ -53,7 +53,7 @@ class Robot {
    */
   Robot(
     std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-    float max_rotation, const SpeedConfig& speed_config,
+    float max_tilt, const SpeedConfig& speed_config,
     const LowPassCoefficients& orientation_filter = {},
     const LowPassCoefficients& balance_speed_filter = {}
   );
@@ -104,20 +104,27 @@ class Robot {
   float& angle() { return _current_angle; }
   /** Sets the maximum distance the robot is allowed to move from the global origin in meters. */
   void set_max_distance(float max_distance) { _squared_max_distance = max_distance * max_distance; }
+  /** Sets the maximum ground speed fraction the robot is allowed to move. */
+  void set_max_ground_speed(float speed) { _max_ground_speed = speed; }
+  /** Sets the maximum rotation speed fraction the robot is allowed to rotate. */
+  void set_max_rotation_speed(float speed) { _max_rotation_speed = speed; }
+  /** Sets the maximum tilt the robot can still recover from in degrees. */
+  void set_max_tilt(float max_tilt) {
+    _speed_to_balance_factor = std::sin(max_tilt / 180 * M_PI);
+  }
 
   /** Returns the PID controller for the x-axis  */
   PidController& pid_x() { return _pid_x; }
   /** Returns the PID controller for the y-axis  */
   PidController& pid_y() { return _pid_y; }
-  /** Returns the encoder gain for the balancing mode */
-  float& encoder_gain() { return _encoder_gain; }
 
  private:
   float _speed_to_balance_factor;  // factor for converting speed vector to balance target vector
+  float _max_ground_speed = 1.0;   // input speed fraction
+  float _max_rotation_speed = 1.0; // input speed fraction
   std::array<Omniwheel, 3> _wheels;
   OrientationEstimator _orientation_estimator;
   PidController _pid_x, _pid_y;
-  float _encoder_gain;
   LowPassFilter _balance_speed_filter_x;
   LowPassFilter _balance_speed_filter_y;
   bool _is_speed_global = false;

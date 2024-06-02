@@ -20,10 +20,10 @@ SpeedConfig::SpeedConfig(
 
 Robot::Robot(
   std::array<Omniwheel, 3> wheels, OrientationEstimator orientation_estimator, PidGains pid_gains,
-  float max_rotation, const SpeedConfig& speed_config,
-  const LowPassCoefficients& orientation_filter, const LowPassCoefficients& balance_speed_filter
+  float max_tilt, const SpeedConfig& speed_config, const LowPassCoefficients& orientation_filter,
+  const LowPassCoefficients& balance_speed_filter
 )
-  : _speed_to_balance_factor{static_cast<float>(std::sin(max_rotation / 180 * M_PI))}
+  : _speed_to_balance_factor{static_cast<float>(std::sin(max_tilt / 180 * M_PI))}
   , _wheels{std::move(wheels)}
   , _orientation_estimator{std::move(orientation_estimator)}
   , _pid_x{-1, 1, pid_gains, orientation_filter}
@@ -93,7 +93,9 @@ void Robot::update() {
   _balancing_mode ? update_balancing() : update_ground();
 }
 
-void Robot::update_ground() { drive(bounded_local_target_speed(), _target_rotation); }
+void Robot::update_ground() {
+  drive(bounded_local_target_speed() * _max_ground_speed, _target_rotation * _max_rotation_speed);
+}
 
 void Robot::update_balancing() {
   const auto global_speed = bounded_global_target_speed();
@@ -112,7 +114,7 @@ void Robot::update_balancing() {
   // to cos²(angle) = 1 - sin²(angle) = 1 - down²
   auto x = down.array().square();
   const Eigen::Vector2f efficiency = 1 - down.head<2>().array().square();
-  drive(speed.array() / efficiency.array(), _target_rotation);
+  drive(speed.array() / efficiency.array(), _target_rotation * _max_rotation_speed);
 }
 
 void Robot::set_balancing(bool enabled) {
