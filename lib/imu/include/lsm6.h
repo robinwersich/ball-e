@@ -116,7 +116,7 @@ class LSM6 : I2CDevice {
    */
   LSM6(
     i2c_inst_t* i2c_port, const AccelConfig& config, const GyroConfig& gyro_config, bool sa0 = true,
-    const ImuCalibration& calibration = {},
+    const LSM6Calibration& calibration = {},
     const Eigen::Matrix3f& orientation = Eigen::Matrix3f::Identity()
   );
   /** Turns off the LSM6DSO sensor. */
@@ -149,6 +149,6 @@ class LSM6 : I2CDevice {
   uint64_t period_us() const { return _period_us; }
 
  private:
-  ImuCalibration _calibration;  // includes scaling and orientation
+  LSM6Calibration _calibration;  // includes scaling, bias and orientation
   uint64_t _period_us;
 };

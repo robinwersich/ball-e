@@ -2,12 +2,14 @@
 
 import argparse
 from os import path
+import time
 
 from serial import Serial, SerialException
 
 
 GYRO_COMMAND = "gyro\n".encode()
 ACCEL_COMMAND = "accel\n".encode()
+MAG_COMMAND = "mag\n".encode()
 
 
 def main():
@@ -26,6 +28,30 @@ def main():
     except SerialException:
         print(f"Serial connection to {args.port} failed.")
         exit(1)
+
+    input(
+        "Let's calibrate the magnetometer.\n"
+        "Press enter and then rotate the IMU around the z axis within the next 10 seconds."
+    )
+
+    min_x, max_x, min_y, max_y = 0, 0, 0, 0
+    end = time.time() + 10
+    while time.time() < end:
+        ser.write(MAG_COMMAND)
+        mag_data = ser.readline().decode().strip()
+        x, y = mag_data.split()
+        min_x = min(min_x, float(x))
+        max_x = max(max_x, float(x))
+        min_y = min(min_y, float(y))
+        max_y = max(max_y, float(y))
+    
+    x_bias = (min_x + max_x) / 2
+    y_bias = (min_y + max_y) / 2
+    mag_bias = f"{x_bias} {y_bias}"
+    mag_file = path.join(args.output_dir, 'mag_data.txt')
+    with open(mag_file, 'w') as f:
+        f.write(mag_bias)
+    print(f"Magnetometer bias ({mag_bias}) written to {mag_file}")
 
     input("Let's calibrate the gyrosensor.\nPlace the IMU so that it is still and press enter.")
     ser.write(GYRO_COMMAND)

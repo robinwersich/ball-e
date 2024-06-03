@@ -64,6 +64,7 @@ class LIS3 : I2CDevice {
    */
   LIS3(
     i2c_inst_t* i2c_port, const MagnetometerConfig& config, bool sa0 = true,
+    const LIS3Calibration& calibration = {},
     const Eigen::Matrix2f& orientation = Eigen::Matrix2f::Identity()
   );
   /** Turns off the sensor. */
@@ -87,7 +88,7 @@ class LIS3 : I2CDevice {
   uint64_t period_us() const { return _period_us; }
 
  private:
-  Eigen::Matrix2f _orientation;  // conversion from local to global frame
+  LIS3Calibration _calibration;  // includes scaling, bias and orientation
   float _mag_scale;
   uint64_t _period_us;
 };

@@ -25,7 +25,7 @@ enum Register : uint8_t {
 
 LSM6::LSM6(
   i2c_inst_t* i2c_port, const AccelConfig& accel_config, const GyroConfig& gyro_config, bool sa0,
-  const ImuCalibration& calibration, const Eigen::Matrix3f& orientation
+  const LSM6Calibration& calibration, const Eigen::Matrix3f& orientation
 )
   : I2CDevice{i2c_port, static_cast<uint8_t>(I2C_ADDRESS | sa0)}
   , _calibration{calibration}
@@ -35,7 +35,7 @@ LSM6::LSM6(
   // add scaling and orientation to the calibration
   const auto accel_scale = accel_config.fs.range / std::numeric_limits<int16_t>::max();
   const auto gyro_scale = gyro_config.fs.range / std::numeric_limits<int16_t>::max();
-  // bias is applied before scaling
+  // bias is applied before transformation
   _calibration.accel_bias /= accel_scale;
   _calibration.gyro_bias /= gyro_scale;
   _calibration.accel_transform = orientation * accel_scale * _calibration.accel_transform;

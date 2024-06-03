@@ -23,12 +23,19 @@ enum Register : uint8_t {
 
 LIS3::LIS3(
   i2c_inst_t* i2c_port, const MagnetometerConfig& config, bool sa0,
+  const LIS3Calibration& calibration,
   const Eigen::Matrix2f& orientation
 )
   : I2CDevice{i2c_port, static_cast<uint8_t>(I2C_ADDRESS | sa0 << 1)}
-  , _orientation{orientation}
+  , _calibration{calibration}
   , _mag_scale{config.fs.range / std::numeric_limits<int16_t>::max()}
   , _period_us{static_cast<uint64_t>(std::round(1e6f / config.odr.frequency))} {
+  // add scaling and orientation to the calibration
+  const auto mag_scale = config.fs.range / std::numeric_limits<int16_t>::max();
+  // bias is applied before transformation
+  _calibration.mag_bias /= mag_scale;
+  _calibration.mag_transform = orientation * mag_scale * _calibration.mag_transform;
+
   const uint8_t CTRL_REG1_val = static_cast<uint8_t>(config.odr.code << 1);
   const uint8_t CTRL_REG2_val = static_cast<uint8_t>(config.fs.code << 5);
   const uint8_t CTRL_REG3_val = config.odr.frequency <= 80 ? 0x01 : 0x00;
@@ -66,5 +73,7 @@ Eigen::Vector2<int16_t> LIS3::read_field_raw() const {
 }
 
 Eigen::Vector2f LIS3::read_field() const {
-  return read_field_raw().cast<float>() * _mag_scale;
+  const auto& bias = _calibration.mag_bias;
+  const auto& transform = _calibration.mag_transform;
+  return transform * (read_field_raw().cast<float>() - bias);
 }
