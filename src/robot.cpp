@@ -61,8 +61,62 @@ void Robot::set_rotate_speed(float speed) {
 }
 
 void Robot::stop() {
+  critical_section_enter_blocking(&_cs);
   _target_speed = {0, 0};
   _target_rotation = 0;
+  critical_section_exit(&_cs);
+}
+
+void Robot::set_angle(float radians) {
+  critical_section_enter_blocking(&_cs);
+  _current_angle = radians;
+  critical_section_exit(&_cs);
+}
+
+void Robot::set_position(const Eigen::Vector2f& position) {
+  critical_section_enter_blocking(&_cs);
+  _current_position = position;
+  critical_section_exit(&_cs);
+}
+
+void Robot::set_max_distance(float distance) {
+  critical_section_enter_blocking(&_cs);
+  _squared_max_distance = distance * distance;
+  critical_section_exit(&_cs);
+}
+
+void Robot::set_max_ground_speed(float speed) {
+  critical_section_enter_blocking(&_cs);
+  _max_ground_speed = speed;
+  critical_section_exit(&_cs);
+}
+
+void Robot::set_max_rotation_speed(float speed) {
+  critical_section_enter_blocking(&_cs);
+  _max_rotation_speed = speed;
+  critical_section_exit(&_cs);
+}
+
+void Robot::set_max_tilt(float max_tilt) {
+  critical_section_enter_blocking(&_cs);
+  _speed_to_balance_factor = static_cast<float>(std::sin(max_tilt / 180 * M_PI));
+  critical_section_exit(&_cs);
+}
+
+void Robot::toggle_balancing() {
+  set_balancing(!_balancing_mode);
+}
+
+void Robot::set_balancing(bool enabled) {
+  if (_balancing_mode == false and enabled == true) reset_balancing();
+
+  critical_section_enter_blocking(&_cs);
+  set_balancing(enabled);
+  critical_section_exit(&_cs);
+}
+
+bool Robot::is_balancing() const {
+  return _balancing_mode;
 }
 
 void Robot::start_updating() {
@@ -115,12 +169,6 @@ void Robot::update_balancing() {
   auto x = down.array().square();
   const Eigen::Vector2f efficiency = 1 - down.head<2>().array().square();
   drive(speed.array() / efficiency.array(), _target_rotation * _max_rotation_speed);
-}
-
-void Robot::set_balancing(bool enabled) {
-  if (_balancing_mode == false and enabled == true) reset_balancing();
-
-  _balancing_mode = enabled;
 }
 
 void Robot::reset_balancing() {

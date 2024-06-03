@@ -20,36 +20,14 @@ void RobotController::initialize_limits() {
 
 void RobotController::run_loop() { btcontrol::run_loop(); }
 
-uint16_t RobotController::get_pressed_buttons(uint16_t current_buttons) {
-  const uint16_t pressed_buttons = ~_last_buttons & current_buttons;
-  _last_buttons = current_buttons;
-  return pressed_buttons;
-}
-
-uint16_t RobotController::get_released_buttons(uint16_t current_buttons) {
-  const uint16_t released_buttons = _last_buttons & ~current_buttons;
-  _last_buttons = current_buttons;
-  return released_buttons;
-}
-
-uint8_t RobotController::get_pressed_dpad(uint8_t current_dpad) {
-  const uint8_t pressed_dpad = ~_last_dpad & current_dpad;
-  _last_dpad = current_dpad;
-  return pressed_dpad;
-}
-
-uint8_t RobotController::get_released_dpad(uint8_t current_dpad) {
-  const uint8_t released_dpad = _last_dpad & ~current_dpad;
-  _last_dpad = current_dpad;
-  return released_dpad;
-}
-
 void RobotController::on_gamepad_data(const uni_gamepad_t& gamepad) {
-  const auto pressed_buttons = get_pressed_buttons(gamepad.buttons);
-  const auto released_buttons = get_released_buttons(gamepad.buttons);
-  const auto pressed_dpad = get_pressed_dpad(gamepad.dpad);
-  const auto left_shoulder = gamepad.brake / MAX_TRIGGER_VALUE;
-  const auto right_shoulder = gamepad.throttle / MAX_TRIGGER_VALUE;
+  const auto pressed_buttons = ~_last_buttons & gamepad.buttons;
+  const auto released_buttons = _last_buttons & ~gamepad.buttons;
+  _last_buttons = gamepad.buttons;
+  const auto pressed_dpad = ~_last_dpad & gamepad.dpad;
+  _last_dpad = gamepad.dpad;
+  const auto left_trigger = gamepad.brake / MAX_TRIGGER_VALUE;
+  const auto right_trigger = gamepad.throttle / MAX_TRIGGER_VALUE;
   const Eigen::Vector2f left_stick = {
     gamepad.axis_x / MAX_STICK_VALUE, gamepad.axis_y / MAX_STICK_VALUE
   };
@@ -89,16 +67,19 @@ void RobotController::on_gamepad_data(const uni_gamepad_t& gamepad) {
   // activate angle calibration
   if (released_buttons & BUTTON_SHOULDER_L) {
     if (!_forward_orientation.isZero()) {
-      _robot->angle() = angle_between({0, 1}, _forward_orientation);
+      _robot->set_angle(angle_between({0, 1}, _forward_orientation));
     }
     _forward_orientation = {0, 0};
   }
   // reset position
-  if (pressed_buttons & BUTTON_SHOULDER_R) _robot->position() = {0, 0};
+  if (pressed_buttons & BUTTON_SHOULDER_R) _robot->set_position({0, 0});
 
-  if (left_shoulder or right_shoulder) {
+  if (left_trigger or right_trigger) {
     // car mode
-    _robot->set_speed(0, right_shoulder - left_shoulder, -left_stick.x(), false);
+    _robot->set_speed(0, right_trigger - left_trigger, -left_stick.x(), false);
+  } else if (gamepad.buttons & BUTTON_SHOULDER_L) {
+    // calibration mode
+    _robot->stop();
   } else {
     // omnidirectional mode
     _robot->set_speed(right_stick.x(), right_stick.y(), -left_stick.x(), _global_mode);

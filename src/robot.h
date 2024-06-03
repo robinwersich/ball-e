@@ -89,29 +89,27 @@ class Robot {
   /** Enables or disables the ball balancing mode. */
   void set_balancing(bool enabled);
   /** Toggles the ball balancing mode. */
-  void toggle_balancing() { _balancing_mode = !_balancing_mode; }
+  void toggle_balancing();
   /** Returns true if the robot is currently balancing. */
-  bool is_balancing() const { return _balancing_mode; }
+  bool is_balancing() const;
 
   /** Sets up a timer interrupt for handling the robot movement. */
   void start_updating();
   /** Stops the timer interrupt for handling the robot movement. */
   void stop_updating();
 
-  /** Returns the current position estimate in meters. */
-  Eigen::Vector2f& position() { return _current_position; }
-  /** Returns the current angle estimate. */
-  float& angle() { return _current_angle; }
+  /** Sets the current position estimate in meters. */
+  void set_position(const Eigen::Vector2f&);
+  /** Sets the current angle estimate in radians. */
+  void set_angle(float radians);
   /** Sets the maximum distance the robot is allowed to move from the global origin in meters. */
-  void set_max_distance(float max_distance) { _squared_max_distance = max_distance * max_distance; }
+  void set_max_distance(float max_distance);
   /** Sets the maximum ground speed fraction the robot is allowed to move. */
-  void set_max_ground_speed(float speed) { _max_ground_speed = speed; }
+  void set_max_ground_speed(float speed);
   /** Sets the maximum rotation speed fraction the robot is allowed to rotate. */
-  void set_max_rotation_speed(float speed) { _max_rotation_speed = speed; }
+  void set_max_rotation_speed(float speed);
   /** Sets the maximum tilt the robot can still recover from in degrees. */
-  void set_max_tilt(float max_tilt) {
-    _speed_to_balance_factor = std::sin(max_tilt / 180 * M_PI);
-  }
+  void set_max_tilt(float max_tilt);
 
   /** Returns the PID controller for the x-axis  */
   PidController& pid_x() { return _pid_x; }

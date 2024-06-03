@@ -23,7 +23,7 @@ struct ValueRange {
 
 class RobotController {
   /** Max distance the robot is allowed to move from the center in constraint mode. */
-  const float MAX_DISTANCE = 1.5;
+  const float MAX_DISTANCE = 0.75;
   const float MAX_TRIGGER_VALUE = 1024;
   const float MAX_STICK_VALUE = 512;
 
@@ -52,15 +52,6 @@ class RobotController {
 
   /** Handles incoming gamepad data. */
   void on_gamepad_data(const uni_gamepad_t& gamepad);
-
-  /** Returns the buttons that have been pressed since the last call. */
-  uint16_t get_pressed_buttons(uint16_t current_buttons);
-  /** Returns the buttons that have been released since the last call. */
-  uint16_t get_released_buttons(uint16_t current_buttons);
-  /** Returns the dpad buttons that have been pressed since the last call. */
-  uint8_t get_pressed_dpad(uint8_t current_dpad);
-  /** Returns the dpad buttons that have been released since the last call. */
-  uint8_t get_released_dpad(uint8_t current_dpad);
 };
 
 /** Returns the angle to get from vector a to vector b in radians. */
