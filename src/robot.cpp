@@ -225,11 +225,15 @@ void Robot::update_pos_and_angle() {
     _current_position += local_to_global_speed(_measured_speed) * rev_to_m * (dt / 1e6f);
   }
 
-  if (_is_rotating) {
-    const auto rev_to_rad =
-      _balancing_mode ? _speed_config.balance_rad_per_rev : _speed_config.ground_rad_per_rev;
-    _current_angle += _measured_rotation * rev_to_rad * (dt / 1e6f);
-  }
+  // legacy angle measurement using encoders
+  // if (_is_rotating) {
+  //   const auto rev_to_rad =
+  //     _balancing_mode ? _speed_config.balance_rad_per_rev : _speed_config.ground_rad_per_rev;
+  //   _current_angle += _measured_rotation * rev_to_rad * (dt / 1e6f);
+  // }
+
+  // angle measurement using IMU
+  _current_angle = _orientation_estimator.z_angle();
 }
 
 Eigen::Vector2f Robot::compute_target_vector(Eigen::Vector2f target_speed) const {

@@ -27,6 +27,7 @@ int main() {
     if (orientation_estimator.update()) {
       const auto up = orientation_estimator.up();
       show_vector("up", up.x(), up.y(), up.z());
+      plot("z angle", orientation_estimator.z_angle() * 180 / M_PI);
     }
   }
 }

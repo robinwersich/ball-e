@@ -23,6 +23,9 @@ class OrientationEstimator {
   /** Returns the current orientation as the global up vector in device-local coordinates. */
   const Eigen::Vector3f& up() const { return _up; }
 
+  /** Returns the current angle of the device around the up vector in radians. */
+  float z_angle() const { return _z_angle; }
+
   /** Returns the expected time to wait between new sensor data */
   const uint64_t update_period_us() const { return _imu->period_us(); }
 
@@ -33,6 +36,7 @@ class OrientationEstimator {
  private:
   std::shared_ptr<LSM6> _imu;
   Eigen::Vector3f _up;
+  float _z_angle = 0;  // rotation around the z axis
   uint32_t _last_update = 0;
 
   /** Returns the up vector based on the accelerometer. */

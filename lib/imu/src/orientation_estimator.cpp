@@ -41,6 +41,8 @@ bool OrientationEstimator::update(bool force) {
   // Using mainly gyroscope but adding a bit of the accelerometer avoids drift and noise.
   _up = (gyro_up * GYRO_WEIGHT + accel_up * ACCEL_WEIGHT).normalized();
 
+  _z_angle += rotation.z() * dt * M_PI / 180;
+
 #ifndef NDEBUG
   if (show_debug) {
     show_vector("gyro_up", gyro_up.x(), gyro_up.y(), gyro_up.z());
