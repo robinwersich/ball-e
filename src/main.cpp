@@ -23,9 +23,6 @@ const uint ENC3_SLOT = 5;
 // -- IMU --
 const uint IMU_SLOT = 7;
 
-std::unique_ptr<Robot> robot;
-RobotController controller{robot.get()};
-
 int main() {
   stdio_init_all();
 
@@ -66,25 +63,30 @@ int main() {
   MotorDecoder decoder_3{ENC3_SLOT, true};
 
   // setup speed config
-  SpeedConfig speed_config(
-    750 / M_PI / 2, 30.95, 57.46, 30.576, 54.277, 100
-  );
+  SpeedConfig speed_config(750 / M_PI / 2, 30.95, 57.46, 30.576, 54.277, 100);
 
   // setup robot
-  robot = std::make_unique<Robot>(
+  Robot robot{
     std::array<Omniwheel, 3>{
       Omniwheel(30, std::move(driver_1), MotorState{&decoder_1.state(), 6, 115}),
       Omniwheel(150, std::move(driver_2), MotorState{&decoder_2.state(), 6, 115}),
       Omniwheel(270, std::move(driver_3), MotorState{&decoder_3.state(), 6, 115})
     },
-    OrientationEstimator{imu}, PidGains{15.0, 500.0, 0.0}, 2.5, speed_config,
+    OrientationEstimator{imu},
+    PidGains{15.0, 500.0, 0.0},
+    2.5,
+    speed_config,
     LowPassCoefficients{.a1 = 0.85956724, .b0 = 0.07021638, .b1 = 0.07021638},
     LowPassCoefficients{.a1 = 0.97024184, .b0 = 0.01487908, .b1 = 0.01487908}
-  );
+  };
 
+  // setup robot controller
+  RobotController controller{&robot};
   RobotController::initialize_controller(&controller);
-  robot->start_updating();
-  controller.start_loop();
+
+  // start controll loops
+  robot.start_updating();
+  controller.run_loop();
 
   return 0;
 }

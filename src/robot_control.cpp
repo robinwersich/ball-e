@@ -18,7 +18,7 @@ void RobotController::initialize_limits() {
   _robot->set_max_rotation_speed(_rotation_limit_range.current());
 }
 
-void RobotController::start_loop() { btcontrol::run_loop(); }
+void RobotController::run_loop() { btcontrol::run_loop(); }
 
 uint16_t RobotController::get_pressed_buttons(uint16_t current_buttons) {
   const uint16_t pressed_buttons = ~_last_buttons & current_buttons;
@@ -48,8 +48,8 @@ void RobotController::on_gamepad_data(const uni_gamepad_t& gamepad) {
   const auto pressed_buttons = get_pressed_buttons(gamepad.buttons);
   const auto released_buttons = get_released_buttons(gamepad.buttons);
   const auto pressed_dpad = get_pressed_dpad(gamepad.dpad);
-  const float left_shoulder = gamepad.brake / MAX_TRIGGER_VALUE;
-  const float right_shoulder = gamepad.throttle / MAX_TRIGGER_VALUE;
+  const auto left_shoulder = gamepad.brake / MAX_TRIGGER_VALUE;
+  const auto right_shoulder = gamepad.throttle / MAX_TRIGGER_VALUE;
   const Eigen::Vector2f left_stick = {
     gamepad.axis_x / MAX_STICK_VALUE, gamepad.axis_y / MAX_STICK_VALUE
   };

@@ -34,7 +34,7 @@ class RobotController {
   static void initialize_controller(RobotController* controller);
 
   /** Starts the control loop. Will not return. */
-  void start_loop();
+  void run_loop();
 
  private:
   Robot* _robot;
