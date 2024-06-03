@@ -61,28 +61,28 @@ void RobotController::on_gamepad_data(const uni_gamepad_t& gamepad) {
   // decrease rotation limit
   if (pressed_dpad & DPAD_RIGHT) _robot->set_max_rotation_speed(_rotation_limit_range.increase());
   // record angle calibration
-  if (gamepad.buttons & BUTTON_SHOULDER_L and right_stick.norm() > 0.5) {
-    _forward_orientation = right_stick;
+  if (gamepad.buttons & BUTTON_SHOULDER_R and left_stick.norm() > 0.5) {
+    _forward_orientation = left_stick;
   }
   // activate angle calibration
-  if (released_buttons & BUTTON_SHOULDER_L) {
+  if (released_buttons & BUTTON_SHOULDER_R) {
     if (!_forward_orientation.isZero()) {
       _robot->set_angle(angle_between({0, 1}, _forward_orientation));
     }
     _forward_orientation = {0, 0};
   }
   // reset position
-  if (pressed_buttons & BUTTON_SHOULDER_R) _robot->set_position({0, 0});
+  if (pressed_buttons & BUTTON_SHOULDER_L) _robot->set_position({0, 0});
 
   if (left_trigger or right_trigger) {
     // car mode
-    _robot->set_speed(0, right_trigger - left_trigger, -left_stick.x(), false);
-  } else if (gamepad.buttons & BUTTON_SHOULDER_L) {
+    _robot->set_speed(0, right_trigger - left_trigger, -right_stick.x(), false);
+  } else if (gamepad.buttons & BUTTON_SHOULDER_R) {
     // calibration mode
     _robot->stop();
   } else {
     // omnidirectional mode
-    _robot->set_speed(right_stick.x(), right_stick.y(), -left_stick.x(), _global_mode);
+    _robot->set_speed(left_stick.x(), left_stick.y(), -right_stick.x(), _global_mode);
   }
 }
 
