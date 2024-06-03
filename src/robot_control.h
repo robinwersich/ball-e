@@ -40,7 +40,7 @@ class RobotController {
   Robot* _robot;
   uint16_t _last_buttons = 0x0000;
   uint8_t _last_dpad = 0x00;
-  bool _global_mode = true;
+  bool _global_mode = false;
   bool _constraint_mode = false;
   ValueRange _speed_limit_range = {1, 10, 7, 0.1};
   ValueRange _tilt_limit_range = {25, 35, 25, 0.1};
