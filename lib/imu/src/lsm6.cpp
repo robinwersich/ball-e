@@ -6,7 +6,6 @@
 #include "pico/stdlib.h"
 
 const static uint8_t I2C_ADDRESS = 0b1101010;  // last bit has to be set to sa0
-const static uint BAUDRATE = 400000;           // 400kHz
 
 namespace {
 
@@ -25,11 +24,10 @@ enum Register : uint8_t {
 }
 
 LSM6::LSM6(
-  uint8_t slot, const AccelConfig& accel_config, const GyroConfig& gyro_config, bool sa0,
+  i2c_inst_t* i2c_port, const AccelConfig& accel_config, const GyroConfig& gyro_config, bool sa0,
   const ImuCalibration& calibration, const Eigen::Matrix3f& orientation
 )
-  : _i2c_port{slot % 2 == 0 ? i2c0 : i2c1}
-  , _address{static_cast<uint8_t>(I2C_ADDRESS | sa0)}
+  : I2CDevice{i2c_port, static_cast<uint8_t>(I2C_ADDRESS | sa0)}
   , _calibration{calibration}
   , _period_us{static_cast<uint64_t>(
       std::round(1e6f / std::max(accel_config.odr.frequency, gyro_config.odr.frequency))
@@ -42,13 +40,6 @@ LSM6::LSM6(
   _calibration.gyro_bias /= gyro_scale;
   _calibration.accel_transform = orientation * accel_scale * _calibration.accel_transform;
   _calibration.gyro_transform = orientation * gyro_scale * _calibration.gyro_transform;
-
-  const auto pin_sda = 2 * slot;
-  const auto pin_scl = 2 * slot + 1;
-
-  i2c_init(_i2c_port, BAUDRATE);
-  gpio_set_function(pin_sda, GPIO_FUNC_I2C);
-  gpio_set_function(pin_scl, GPIO_FUNC_I2C);
 
   const uint8_t CTRL1_XL_val = static_cast<uint8_t>(accel_config.odr.code << 4)
                              | static_cast<uint8_t>(accel_config.fs.code << 2)
@@ -72,7 +63,6 @@ LSM6::~LSM6() {
   uint8_t null = 0;
   write(CTRL1_XL, &null, 1);
   write(CTRL2_G, &null, 1);
-  i2c_deinit(_i2c_port);
 }
 
 bool LSM6::is_connected() const {
@@ -119,16 +109,4 @@ Eigen::Vector3<int16_t> LSM6::read_rotation_raw() const {
     static_cast<int16_t>((data[3] << 8) | data[2]),
     static_cast<int16_t>((data[5] << 8) | data[4]),
   };
-}
-
-void LSM6::read(uint8_t reg, uint8_t* data, size_t len) const {
-  i2c_write_blocking(_i2c_port, _address, &reg, 1, true);
-  i2c_read_blocking(_i2c_port, _address, data, len, false);
-}
-
-void LSM6::write(uint8_t reg, const uint8_t* data, size_t len) const {
-  std::vector<uint8_t> buffer(1 + len);
-  buffer[0] = reg;
-  std::copy(data, data + len, buffer.begin() + 1);
-  i2c_write_blocking(_i2c_port, _address, buffer.data(), buffer.size(), false);
 }

@@ -12,8 +12,9 @@ int main() {
 
   LSM6::AccelConfig accel_config{.odr = lsm6::odr::HZ_208, .fs = lsm6::fs::acc::G_2};
   LSM6::GyroConfig gyro_config{.odr = lsm6::odr::HZ_208, .fs = lsm6::fs::gyro::DPS_1000};
+  const auto i2c_port = init_i2c_port(7, LSM6::MAX_BAUDRATE);
   const auto imu = std::make_shared<LSM6>(
-    7, accel_config, gyro_config, true, IMU_CALIBRATION,
+    i2c_port, accel_config, gyro_config, true, IMU_CALIBRATION,
     Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
   );
   if (not imu->is_connected()) {

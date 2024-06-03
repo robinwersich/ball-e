@@ -41,7 +41,8 @@ int main() {
 
   const LSM6::AccelConfig accel_config{.odr = odr::HZ_104, .fs = fs::acc::G_2};
   const LSM6::GyroConfig gyro_config{.odr = odr::HZ_104, .fs = fs::gyro::DPS_500};
-  const LSM6 imu(7, accel_config, gyro_config);
+  const auto i2c_port = init_i2c_port(7, LSM6::MAX_BAUDRATE);
+  const LSM6 imu(i2c_port, accel_config, gyro_config);
 
   std::string command;
   while (true) {

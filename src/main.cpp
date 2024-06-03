@@ -40,8 +40,9 @@ int main() {
   LSM6::GyroConfig gyro_config{
     .odr = odr::HZ_104, .fs = fs::gyro::DPS_1000, .lp_intensity = cutoff::gyro::CO_7
   };
+  const auto i2c_port = init_i2c_port(IMU_SLOT, LSM6::MAX_BAUDRATE);
   const auto imu = std::make_shared<LSM6>(
-    7, accel_config, gyro_config, true, IMU_CALIBRATION,
+    i2c_port, accel_config, gyro_config, true, IMU_CALIBRATION,
     Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
   );
 

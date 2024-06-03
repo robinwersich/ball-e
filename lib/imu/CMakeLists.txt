@@ -1,4 +1,5 @@
 add_library(imu STATIC
+  ./src/i2c_device.cpp
   ./src/lsm6.cpp
   ./src/orientation_estimator.cpp
 )
