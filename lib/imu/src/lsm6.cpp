@@ -50,13 +50,11 @@ LSM6::LSM6(
   const uint8_t CTRL6_C_val = static_cast<uint8_t>(gyro_config.lp_intensity & 0b0111);
   const uint8_t CTRL8_XL_val = static_cast<uint8_t>((accel_config.lp_cutoff & 0b0111) << 5);
 
-  sleep_ms(100);
   write(CTRL1_XL, &CTRL1_XL_val, 1);
   write(CTRL2_G, &CTRL2_G_val, 1);
   write(CTRL4_C, &CTRL4_C_val, 1);
   write(CTRL6_C, &CTRL6_C_val, 1);
   write(CTRL8_XL, &CTRL8_XL_val, 1);
-  sleep_ms(100);
 }
 
 LSM6::~LSM6() {
