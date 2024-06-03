@@ -42,6 +42,7 @@ void RobotController::on_gamepad_data(const uni_gamepad_t& gamepad) {
   // toggle constraint mode
   if (pressed_buttons & BUTTON_X) {
     _constraint_mode = !_constraint_mode;
+    if (_constraint_mode) _robot->set_position({0, 0});
     _robot->set_max_distance(
       _constraint_mode ? MAX_DISTANCE : std::numeric_limits<float>::infinity()
     );

@@ -108,10 +108,9 @@ void Robot::toggle_balancing() {
 }
 
 void Robot::set_balancing(bool enabled) {
-  if (_balancing_mode == false and enabled == true) reset_balancing();
-
   critical_section_enter_blocking(&_cs);
-  set_balancing(enabled);
+  if (_balancing_mode == false and enabled == true) reset_balancing();
+  _balancing_mode = enabled;
   critical_section_exit(&_cs);
 }
 

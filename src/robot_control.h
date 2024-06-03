@@ -43,7 +43,7 @@ class RobotController {
   bool _global_mode = false;
   bool _constraint_mode = false;
   ValueRange _speed_limit_range = {1, 10, 7, 0.1};
-  ValueRange _tilt_limit_range = {25, 35, 25, 0.1};
+  ValueRange _tilt_limit_range = {20, 30, 25, 0.1};
   ValueRange _rotation_limit_range = {1, 10, 3, 0.1};
   Eigen::Vector2f _forward_orientation = {0, 0};  // only used while calibrating orientation
 
