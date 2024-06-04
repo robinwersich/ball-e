@@ -32,6 +32,8 @@ Robot::Robot(
   , _balance_speed_filter_y{balance_speed_filter}
   , _speed_config{speed_config} {
   critical_section_init(&_cs);
+  _orientation_estimator.update(true);
+  _angle_offset = _orientation_estimator.horizonatal_angle();
 }
 
 Robot::~Robot() {

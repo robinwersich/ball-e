@@ -117,9 +117,9 @@ class Robot {
   PidController& pid_y() { return _pid_y; }
 
  private:
-  float _speed_to_balance_factor;  // factor for converting speed vector to balance target vector
-  float _max_ground_speed = 1.0;   // input speed fraction
-  float _max_rotation_speed = 1.0; // input speed fraction
+  float _speed_to_balance_factor;   // factor for converting speed vector to balance target vector
+  float _max_ground_speed = 1.0;    // input speed fraction
+  float _max_rotation_speed = 1.0;  // input speed fraction
   std::array<Omniwheel, 3> _wheels;
   OrientationEstimator _orientation_estimator;
   PidController _pid_x, _pid_y;
@@ -127,15 +127,15 @@ class Robot {
   LowPassFilter _balance_speed_filter_y;
   bool _is_speed_global = false;
   float _squared_max_distance = std::numeric_limits<float>::infinity();
-  Eigen::Vector2f _target_speed = {0, 0};      // fractional speed, local or global
-  float _target_rotation = 0;                  // fractional speed
-  bool _is_translating = false;                // whether there currently is a translation signal
-  bool _is_rotating = false;                   // whether there currently is a rotation signal
-  Eigen::Vector2f _measured_speed = {0, 0};    // rps, local
-  float _measured_rotation = 0;                // rps
-  float _current_angle = 0;                    // radians
-  Eigen::Vector2f _current_position = {0, 0};  // meters, global
-  float _angle_offset = 0;                     // radians
+  Eigen::Vector2f _target_speed = {0, 0};    // fractional speed, local or global
+  float _target_rotation = 0;                // fractional speed
+  bool _is_translating = false;              // whether there currently is a translation signal
+  bool _is_rotating = false;                 // whether there currently is a rotation signal
+  Eigen::Vector2f _measured_speed = {0, 0};  // rps, local
+  float _measured_rotation = 0;              // rps
+  float _current_angle = 0;                  // radians
+  Eigen::Vector2f _current_position;         // meters, global
+  float _angle_offset = 0;                   // radians
   SpeedConfig _speed_config;
   bool _balancing_mode = false;
   repeating_timer_t _balance_update_timer;
