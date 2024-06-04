@@ -40,11 +40,11 @@ class RobotController {
   Robot* _robot;
   uint16_t _last_buttons = 0x0000;
   uint8_t _last_dpad = 0x00;
-  bool _global_mode = false;
+  bool _global_mode = true;
   bool _constraint_mode = false;
-  ValueRange _speed_limit_range = {1, 10, 7, 0.1};
+  ValueRange _speed_limit_range = {1, 10, 8, 0.1};
   ValueRange _tilt_limit_range = {20, 30, 25, 0.1};
-  ValueRange _rotation_limit_range = {1, 10, 3, 0.1};
+  ValueRange _rotation_limit_range = {1, 10, 5, 0.1};
   Eigen::Vector2f _forward_orientation = {0, 0};  // only used while calibrating orientation
 
   /** Sets the speed, tilt and rotation limits of the robot to the current values. */
