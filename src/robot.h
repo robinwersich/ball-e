@@ -135,6 +135,7 @@ class Robot {
   float _measured_rotation = 0;                // rps
   float _current_angle = 0;                    // radians
   Eigen::Vector2f _current_position = {0, 0};  // meters, global
+  float _angle_offset = 0;                     // radians
   SpeedConfig _speed_config;
   bool _balancing_mode = false;
   repeating_timer_t _balance_update_timer;

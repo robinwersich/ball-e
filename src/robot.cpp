@@ -69,6 +69,7 @@ void Robot::stop() {
 
 void Robot::set_angle(float radians) {
   critical_section_enter_blocking(&_cs);
+  _angle_offset = _orientation_estimator.horizonatal_angle() - radians;
   _current_angle = radians;
   critical_section_exit(&_cs);
 }
@@ -229,7 +230,7 @@ void Robot::update_pos_and_angle() {
   // }
 
   // angle measurement using IMU
-  _current_angle = _orientation_estimator.horizonatal_angle();
+  _current_angle = _orientation_estimator.horizonatal_angle() - _angle_offset;
 }
 
 Eigen::Vector2f Robot::compute_target_vector(Eigen::Vector2f target_speed) const {
