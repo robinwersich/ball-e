@@ -103,9 +103,7 @@ void Robot::set_max_tilt(float max_tilt) {
   critical_section_exit(&_cs);
 }
 
-void Robot::toggle_balancing() {
-  set_balancing(!_balancing_mode);
-}
+void Robot::toggle_balancing() { set_balancing(!_balancing_mode); }
 
 void Robot::set_balancing(bool enabled) {
   critical_section_enter_blocking(&_cs);
@@ -114,9 +112,7 @@ void Robot::set_balancing(bool enabled) {
   critical_section_exit(&_cs);
 }
 
-bool Robot::is_balancing() const {
-  return _balancing_mode;
-}
+bool Robot::is_balancing() const { return _balancing_mode; }
 
 void Robot::start_updating() {
   _last_update_us = time_us_32();
@@ -233,7 +229,7 @@ void Robot::update_pos_and_angle() {
   // }
 
   // angle measurement using IMU
-  _current_angle = _orientation_estimator.z_angle();
+  _current_angle = _orientation_estimator.horizonatal_angle();
 }
 
 Eigen::Vector2f Robot::compute_target_vector(Eigen::Vector2f target_speed) const {

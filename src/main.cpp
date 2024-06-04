@@ -33,18 +33,25 @@ int main() {
   irq_set_priority(TIMER_IRQ_3, PICO_DEFAULT_IRQ_PRIORITY + 1);
 
   // setup IMU
-  using namespace lsm6;
+  sleep_ms(100);
   LSM6::AccelConfig accel_config{
-    .odr = odr::HZ_104, .fs = fs::acc::G_2, .lp_cutoff = cutoff::accel::CO_45
+    .odr = lsm6::odr::HZ_104, .fs = lsm6::fs::acc::G_2, .lp_cutoff = lsm6::cutoff::accel::CO_45
   };
   LSM6::GyroConfig gyro_config{
-    .odr = odr::HZ_104, .fs = fs::gyro::DPS_1000, .lp_intensity = cutoff::gyro::CO_7
+    .odr = lsm6::odr::HZ_104,
+    .fs = lsm6::fs::gyro::DPS_1000,
+    .lp_intensity = lsm6::cutoff::gyro::CO_7
   };
   const auto i2c_port = init_i2c_port(IMU_SLOT, LSM6::MAX_BAUDRATE);
-  const auto imu = std::make_shared<LSM6>(
+  const auto lsm6 = std::make_shared<LSM6>(
     i2c_port, accel_config, gyro_config, true, LSM6_CALIBRATION,
     Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
   );
+  const auto lis3 = std::make_shared<LIS3>(
+    i2c_port, LIS3::MagnetometerConfig{.odr = lis3::odr::HZ_155, .fs = lis3::fs::GS_4}, true,
+    LIS3_CALIBRATION, Eigen::Matrix3f{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
+  );
+  sleep_ms(100);
 
   // setup motor drivers
   Kickstart kickstart{.start_threshold = 0.4, .end_threshold = 0.15, .duration_ms = 10};
@@ -73,7 +80,7 @@ int main() {
       Omniwheel(150, std::move(driver_2), MotorState{&decoder_2.state(), 6, 115}),
       Omniwheel(270, std::move(driver_3), MotorState{&decoder_3.state(), 6, 115})
     },
-    OrientationEstimator{imu},
+    OrientationEstimator{lsm6, lis3},
     PidGains{15.0, 500.0, 0.0},
     2.5,
     speed_config,
