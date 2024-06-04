@@ -36,7 +36,7 @@ Eigen::Vector3d measure_gyro(const LSM6& lsm6, uint sample_count) {
   return gyro_sum / sample_count;
 }
 
-Eigen::Vector2f measure_mag(const LIS3& lis3) {
+Eigen::Vector3f measure_mag(const LIS3& lis3) {
   while (!lis3.is_new_data_available()) {
     sleep_ms(1);
   }
@@ -64,7 +64,7 @@ int main() {
       printf("%f %f %f\n", acc.x(), acc.y(), acc.z());
     } else if (command == "mag") {
       const auto mag = measure_mag(lis3);
-      printf("%f %f\n", mag.x(), mag.y());
+      printf("%f %f %f\n", mag.x(), mag.y(), mag.z());
     } else {
       printf("Unknown command '%s'\n", command.c_str());
     }

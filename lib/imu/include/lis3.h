@@ -65,7 +65,7 @@ class LIS3 : I2CDevice {
   LIS3(
     i2c_inst_t* i2c_port, const MagnetometerConfig& config, bool sa0 = true,
     const LIS3Calibration& calibration = {},
-    const Eigen::Matrix2f& orientation = Eigen::Matrix2f::Identity()
+    const Eigen::Matrix3f& orientation = Eigen::Matrix3f::Identity()
   );
   /** Turns off the sensor. */
   ~LIS3();
@@ -80,9 +80,9 @@ class LIS3 : I2CDevice {
   bool is_new_data_available() const;
 
   /** Returns the raw value of the current magnetic field. */
-  Eigen::Vector2<int16_t> read_field_raw() const;
+  Eigen::Vector3<int16_t> read_field_raw() const;
   /** Returns the current magnetic field in gauss. */
-  Eigen::Vector2f read_field() const;
+  Eigen::Vector3f read_field() const;
 
   /** Returns the duration between two measurements. */
   uint64_t period_us() const { return _period_us; }

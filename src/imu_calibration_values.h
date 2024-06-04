@@ -14,5 +14,5 @@ static const LSM6Calibration LSM6_CALIBRATION{
 };
 
 static const LIS3Calibration LIS3_CALIBRATION{
-  .mag_bias = Eigen::Vector2f{0.105289, -0.192999},
+  .mag_bias = Eigen::Vector3f{0.083621, -0.1706595, -0.298227},
 };

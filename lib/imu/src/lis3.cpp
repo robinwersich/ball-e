@@ -15,6 +15,7 @@ enum Register : uint8_t {
   CTRL_REG1 = 0x20,
   CTRL_REG2 = 0x21,
   CTRL_REG3 = 0x22,
+  CTRL_REG4 = 0x23,
   STATUS_REG = 0x27,
   MAG_OUT = 0x28,
 };
@@ -24,7 +25,7 @@ enum Register : uint8_t {
 LIS3::LIS3(
   i2c_inst_t* i2c_port, const MagnetometerConfig& config, bool sa0,
   const LIS3Calibration& calibration,
-  const Eigen::Matrix2f& orientation
+  const Eigen::Matrix3f& orientation
 )
   : I2CDevice{i2c_port, static_cast<uint8_t>(I2C_ADDRESS | sa0 << 1)}
   , _calibration{calibration}
@@ -38,11 +39,13 @@ LIS3::LIS3(
 
   const uint8_t CTRL_REG1_val = static_cast<uint8_t>(config.odr.code << 1);
   const uint8_t CTRL_REG2_val = static_cast<uint8_t>(config.fs.code << 5);
-  const uint8_t CTRL_REG3_val = config.odr.frequency <= 80 ? 0x01 : 0x00;
+  const uint8_t CTRL_REG3_val = config.odr.frequency <= 80 ? 0b01 : 0b00;
+  const uint8_t CTRL_REG4_val = static_cast<uint8_t>((config.odr.code >> 2) & 0b00001100);
 
   write(CTRL_REG1, &CTRL_REG1_val, 1);
   write(CTRL_REG2, &CTRL_REG2_val, 1);
   write(CTRL_REG3, &CTRL_REG3_val, 1);
+  write(CTRL_REG4, &CTRL_REG4_val, 1);
 }
 
 LIS3::~LIS3() {
@@ -59,20 +62,21 @@ bool LIS3::is_connected() const {
 bool LIS3::is_new_data_available() const {
   uint8_t status;
   read(STATUS_REG, &status, 1);
-  return (status & 0x03);
+  return (status & 0b00000111);
 }
 
-Eigen::Vector2<int16_t> LIS3::read_field_raw() const {
-  uint8_t data[4];
-  read(MAG_OUT, data, 4);
+Eigen::Vector3<int16_t> LIS3::read_field_raw() const {
+  uint8_t data[6];
+  read(MAG_OUT, data, 6);
 
   return {
     static_cast<int16_t>((data[1] << 8) | data[0]),
     static_cast<int16_t>((data[3] << 8) | data[2]),
+    static_cast<int16_t>((data[5] << 8) | data[4]),
   };
 }
 
-Eigen::Vector2f LIS3::read_field() const {
+Eigen::Vector3f LIS3::read_field() const {
   const auto& bias = _calibration.mag_bias;
   const auto& transform = _calibration.mag_transform;
   return transform * (read_field_raw().cast<float>() - bias);

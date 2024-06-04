@@ -43,6 +43,7 @@ int main() {
       const auto mag = lis3.read_field();
       plot("mag_x", mag.x());
       plot("mag_y", mag.y());
+      plot("mag_z", mag.z());
     }
   }
 }

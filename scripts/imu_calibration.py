@@ -31,23 +31,26 @@ def main():
 
     input(
         "Let's calibrate the magnetometer.\n"
-        "Press enter and then rotate the IMU around the z axis within the next 10 seconds."
+        "Press enter and then rotate the IMU around all axes within the next 25 seconds."
     )
 
-    min_x, max_x, min_y, max_y = 0, 0, 0, 0
-    end = time.time() + 10
+    min_x, max_x, min_y, max_y, min_z, max_z = 0, 0, 0, 0, 0, 0
+    end = time.time() + 25
     while time.time() < end:
         ser.write(MAG_COMMAND)
         mag_data = ser.readline().decode().strip()
-        x, y = mag_data.split()
+        x, y, z = mag_data.split()
         min_x = min(min_x, float(x))
         max_x = max(max_x, float(x))
         min_y = min(min_y, float(y))
         max_y = max(max_y, float(y))
+        min_z = min(min_z, float(z))
+        max_z = max(max_z, float(z))
     
     x_bias = (min_x + max_x) / 2
     y_bias = (min_y + max_y) / 2
-    mag_bias = f"{x_bias} {y_bias}"
+    z_bias = (min_z + max_z) / 2
+    mag_bias = f"{x_bias} {y_bias} {z_bias}"
     mag_file = path.join(args.output_dir, 'mag_data.txt')
     with open(mag_file, 'w') as f:
         f.write(mag_bias)

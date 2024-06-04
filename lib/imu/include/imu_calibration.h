@@ -10,6 +10,6 @@ struct LSM6Calibration {
 };
 
 struct LIS3Calibration {
-  Eigen::Vector2f mag_bias = Eigen::Vector2f::Zero();
-  Eigen::Matrix2f mag_transform = Eigen::Matrix2f::Identity();
+  Eigen::Vector3f mag_bias = Eigen::Vector3f::Zero();
+  Eigen::Matrix3f mag_transform = Eigen::Matrix3f::Identity();
 };
