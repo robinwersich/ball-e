@@ -23,7 +23,7 @@ struct ValueRange {
 
 class RobotController {
   /** Max distance the robot is allowed to move from the center in constraint mode. */
-  const float MAX_DISTANCE = 0.75;
+  const float MAX_DISTANCE = 0.5;
   const float MAX_TRIGGER_VALUE = 1024;
   const float MAX_STICK_VALUE = 512;
 
