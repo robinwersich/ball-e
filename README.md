@@ -31,6 +31,7 @@ The main concepts in the project explored are:
   - 0.28mm² insulated wire (20cm black, 25cm red, 50cm green, 40cm white)
   - 0.75mm² insulated wire (5cm black, 5cm red)
 - battery connector: 9x5x5 barrel jack to 2x2 pin headers, 15cm length, 0.75mm²
+- USB-A to Micro-USB cable (ca. 15cm length)
 - 6 M3x25 (countersunk or low-profile non-countersunk) and 3 M2.5x15 bolts (socket head cap or other non-countersunk) + nuts for mounting the motors
 - 4 M30 FF PCB spacer
 - 4 M3 threaded heat inserts
@@ -38,6 +39,7 @@ The main concepts in the project explored are:
 - 2cm Velcro for attaching battery
 - metal case (150x150x90)
 - bluetooth gamepad
+- size 7 basketball
 
 ## 3D printed parts
 
@@ -75,6 +77,6 @@ The following describes the setup using [Visual Studio Code](https://code.visual
 ### IMU Calibration
 The IMU needs to be calibrated for good results:
 1. Flash the `playground/imu_calibration` software on the pico.
-1. Use the `scripts/imu_calibration.py` script to retrieve the gyro bias and acceleration measurements.
-1. Use [Magneto](https://sailboatinstruments.blogspot.com/2011/09/improved-magnetometer-calibration-part.html) or a similar tool to get the bias and correction matrix.
+1. Use the `scripts/imu_calibration.py` script to retrieve the magnetometer and gyro bias, as well as accelerometer measurements.
+1. Use [Magneto](https://sailboatinstruments.blogspot.com/2011/09/improved-magnetometer-calibration-part.html) or a similar tool to get the bias and correction matrix for the accelerometer.
 1. Adjust the values in `imu_calibration_values.h` correspondingly.
