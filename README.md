@@ -9,6 +9,12 @@ The main concepts in the project explored are:
 - 3D printing
 - hardware selection and wiring
 
+<div>
+  <img src="images/ball-e_render.jpg" height="200px" style="margin-right: 10px;">
+  <img src="images/ball-e_inside.jpg" height="200px" style="margin-right: 10px;">
+  <img src="images/ball-e.jpg" height="200px">
+</div>
+
 ## Hardware BOM
 
 - 3 [motors with encoders](https://gopigo.io/gopigo3-motor-replacement-kit/)
@@ -52,9 +58,16 @@ The following parts are 3D-printed:
 A 3D model with all printed and non-printed parts can be found [here](https://cad.onshape.com/documents/aef269c9421a5698f51293a2/w/28d1817e881a7e140ad68222/e/52373abffadf50390ef456f1).
 In addition, exported _STEP_ files are available in the `CAD` folder.
 
-## Wiring
+## PCB Wiring
 
-The wiring diagram can be found in the `wiring` folder.
+The wiring diagram for the PCB can be found in the `wiring` folder. The final result should look similar to this:
+<div>
+  <img src="images/protoboard_back.jpg" height="150px" style="margin-right: 10px;">
+  <img src="images/protoboard_front.jpg" height="150px" style="margin-right: 10px;">
+  <img src="images/protoboard_with_components.jpg" height="150px">
+</div>
+
+
 
 ## Project Code
 
