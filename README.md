@@ -1,8 +1,7 @@
-# REP LOTI.05.032 Robin Wersich
+# Ball-E
 
-This project aims to build a robot that can [move and balance on a basketball](https://www.youtube.com/watch?v=eqhnZmMAU6M).
+This robot was created during the **Robot Engineering Project** of the [University of Tartu](https://ut.ee/et) and aimed to build a robot that can [move and balance on a basketball](https://www.youtube.com/watch?v=eqhnZmMAU6M).
 The main concepts in the project explored are:
-
 - use of omniwheels
 - bluetooth remote control
 - balancing control logic
