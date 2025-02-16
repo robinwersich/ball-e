@@ -1,6 +1,6 @@
 # Ball-E
 
-This robot was created during the **Robot Engineering Project** of the [University of Tartu](https://ut.ee/et) and aimed to build a robot that can [move and balance on a basketball](https://www.youtube.com/watch?v=eqhnZmMAU6M).
+This robot was created during the **Robot Engineering Project** of the [University of Tartu](https://ut.ee/et) and aimed to build a robot that can [move and balance on a basketball](https://www.youtube.com/watch?v=eqhnZmMAU6M). The final result can be seen in action [here](https://drive.google.com/file/d/1LnrX0tRvga_g_EQCs7Uyl19VpnJzpEGV/preview).
 The main concepts in the project explored are:
 - use of omniwheels
 - bluetooth remote control
